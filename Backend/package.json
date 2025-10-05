@@ -1,13 +1,23 @@
 {
-  "name": "backend",
+  "name": "apricus-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "🔧 Apricus Ravintola Backend - Express.js palvelin ravintolan API:lle",
   "main": "server.js",
   "scripts": {
-    "dev": "nodemon server.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "kehitys": "nodemon server.js",
+    "tuotanto": "node server.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "backend",
+    "express",
+    "api",
+    "ravintola",
+    "nodejs",
+    "apricus"
+  ],
+  "author": "Tamam",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {

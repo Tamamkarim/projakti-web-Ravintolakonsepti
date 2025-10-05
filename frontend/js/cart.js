@@ -28,3 +28,12 @@ export function clearCart(){ localStorage.removeItem(CART_KEY); return []; }
 export function cartTotal(cart){
   return (cart||loadCart()).reduce((s,i)=>s + (i.price||0) * (i.qty||1), 0);
 }
+
+// Make functions globally available for main-clean.js
+window.loadCart = loadCart;
+window.saveCart = saveCart;
+window.addToCart = addToCart;
+window.removeFromCart = removeFromCart;
+window.updateQty = updateQty;
+window.clearCart = clearCart;
+window.cartTotal = cartTotal;

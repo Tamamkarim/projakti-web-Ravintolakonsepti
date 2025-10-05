@@ -1,383 +1,922 @@
-// تعريف جميع العناصر المهمة في الصفحة
-const selectors = {
-  menu: document.getElementById('menu'),
-  search: document.getElementById('search'),
-  filterVegan: document.getElementById('filter-vegan'),
-  filterGluten: document.getElementById('filter-gluten'),
-  filterLactose: document.getElementById('filter-lactose'),
-  excludeAllergens: document.getElementById('exclude-allergens'),
-  applyFilters: document.getElementById('applyFilters'),
-  cartCount: document.getElementById('cartCount'),
-  btnCart: document.getElementById('btnCart'),
-  cartDrawer: document.getElementById('cartDrawer'),
-  cartItems: document.getElementById('cartItems'),
-  cartTotal: document.getElementById('cartTotal'),
-  btnCheckout: document.getElementById('btnCheckout'),
-  btnFavorites: document.getElementById('btnFavorites'),
-  favDrawer: document.getElementById('favDrawer'),
-  favList: document.getElementById('favList'),
-  btnLogin: document.getElementById('btnLogin'),
-  authModal: document.getElementById('authModal'),
-  authForm: document.getElementById('authForm'),
-  btnRegister: document.getElementById('btnRegister'),
-  btnDoLogin: document.getElementById('btnDoLogin'),
-  btnCloseAuth: document.getElementById('btnCloseAuth'),
-  btnDirections: document.getElementById('btnDirections'),
-  promotions: document.getElementById('promotions'),
-  cartCountSpan: document.getElementById('cartCount')
-};
+// APRICUS - Modern Restaurant Application
+// Enhanced with Finnish language and improved UI/UX
 
-function renderMenu(list){
-  const menuList = Array.isArray(list) ? list : state.menu;
-  selectors.menu.innerHTML = '';
-  if(!menuList || menuList.length===0){
-    selectors.menu.innerHTML = '<p style="text-align:center;color:#a67c1a">Ei tuloksia</p>';
-    return;
-  }
-  menuList.forEach(d => {
-    const el = document.createElement('article');
-    el.className = 'dish';
-    el.innerHTML = `
-      <img src="${d.image_url||'/assets/placeholder.jpg'}" alt="${escapeHtml(d.name_ar||d.name_en||'Ruoka')}">
-      <h3>${escapeHtml(d.name_ar||d.name_en||'Nimi')}${d.available? '':' (Ei saatavilla)'}"</h3>
-      <p>${escapeHtml(d.description || '')}</p>
-      <div class="badges">
-        ${d.vegan?'<span class="badge">Vegaani</span>':''}
-        ${d.gluten_free?'<span class="badge">Gluteeniton</span>':''}
-        ${d.lactose_free?'<span class="badge">Laktoositon</span>':''}
-      </div>
-      <div style="margin-top:auto;display:flex;justify-content:space-between;align-items:center">
-        <div><strong>${(d.price||0).toFixed(2)}</strong> €</div>
-        <div>
-          <button class="btn add" data-id="${d.id}">Lisää ostoskoriin</button>
-          <button class="btn fav" data-id="${d.id}">❤</button>
-        </div>
-      </div>
-    `;
-    selectors.menu.appendChild(el);
-  });
+console.log('🍽️ Apricus - Ravintolasovellus käynnistyy...');
+
+// Wait for DOM to be ready
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('📄 DOM valmis, tarkistetaan riippuvuudet...');
+    
+    // Check for required dependencies
+    function checkDependencies() {
+        const required = ['fetchTodayMenu', 'escapeHtml'];
+        const cartRequired = ['loadCart', 'addToCart', 'removeFromCart', 'updateQty', 'clearCart', 'cartTotal'];
+        
+        const apiReady = required.every(name => typeof window[name] === 'function');
+        const cartReady = cartRequired.every(name => typeof window[name] === 'function');
+        
+        return apiReady && cartReady;
+    }
+    
+    // Initialize when dependencies are ready
+    let checkCount = 0;
+    const maxChecks = 50;
+    
+    function initWhenReady() {
+        if (checkDependencies()) {
+            console.log('✅ Kaikki riippuvuudet valmiina, käynnistetään sovellus');
+            initializeModernApp();
+        } else if (checkCount < maxChecks) {
+            checkCount++;
+            console.log(`⏳ Odotetaan riippuvuuksia... (${checkCount}/${maxChecks})`);
+            setTimeout(initWhenReady, 100);
+        } else {
+            console.error('❌ Riippuvuudet eivät ole valmiina');
+            showNotification('Sovelluksen lataus epäonnistui. Päivitä sivu.', 'error');
+        }
+    }
+    
+    initWhenReady();
+});
+
+// Main application initialization
+function initializeModernApp() {
+    console.log('🎯 Käynnistetään moderni Apricus-sovellus...');
+    
+    // Get required functions from window
+    const { fetchTodayMenu, registerUser, loginUser, postOrder, escapeHtml } = window;
+    const { loadCart, saveCart, addToCart, removeFromCart, updateQty, clearCart, cartTotal } = window;
+
+    // Application state
+    const appState = {
+        menu: [],
+        filteredMenu: [],
+        favorites: JSON.parse(localStorage.getItem('favorites') || '[]'),
+        cart: loadCart(),
+        user: null,
+        currentCategory: 'all',
+        filters: {
+            vegan: false,
+            vegetarian: false,
+            glutenFree: false,
+            lactoseFree: false,
+            allergens: [],
+            maxPrice: 50
+        }
+    };
+
+    // Initialize UI components
+    initializeHeader();
+    initializeFilters();
+    initializeMenu();
+    initializeCart();
+    initializeFavorites();
+    initializeAuth();
+    
+    // Load initial data
+    loadMenuData();
+    updateCartUI();
+    checkAuthStatus();
+
+    // Header functionality
+    function initializeHeader() {
+        console.log('🎯 Alustetaan navigaatio...');
+        
+        // Mobile menu toggle
+        const mobileToggle = document.getElementById('mobileMenuToggle');
+        const navigation = document.querySelector('.main-navigation');
+        
+        if (mobileToggle && navigation) {
+            mobileToggle.addEventListener('click', () => {
+                navigation.classList.toggle('active');
+                mobileToggle.classList.toggle('active');
+                document.getElementById('overlay').classList.toggle('active');
+            });
+        }
+
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        
+        if (searchInput) {
+            searchInput.addEventListener('input', debounce(handleSearch, 300));
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleSearch();
+                }
+            });
+        }
+        
+        if (searchBtn) {
+            searchBtn.addEventListener('click', handleSearch);
+        }
+
+        // Navigation links smooth scrolling
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = e.target.getAttribute('href');
+                if (target && target.startsWith('#')) {
+                    const element = document.querySelector(target);
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        // Close mobile menu if open
+                        navigation.classList.remove('active');
+                        mobileToggle.classList.remove('active');
+                        document.getElementById('overlay').classList.remove('active');
+                    }
+                }
+            });
+        });
+    }
+
+    // Search functionality
+    function handleSearch() {
+        const query = document.getElementById('searchInput').value.toLowerCase().trim();
+        console.log('🔍 Haku:', query);
+        
+        if (!query) {
+            appState.filteredMenu = appState.menu;
+        } else {
+            appState.filteredMenu = appState.menu.filter(item => 
+                item.name.toLowerCase().includes(query) ||
+                item.description.toLowerCase().includes(query) ||
+                item.ingredients.some(ing => ing.toLowerCase().includes(query))
+            );
+        }
+        
+        renderMenu();
+        
+        if (appState.filteredMenu.length === 0 && query) {
+            showNotification(`Ei tuloksia haulle "${query}"`, 'info');
+        }
+    }
+
+    // Filters functionality
+    function initializeFilters() {
+        console.log('🎯 Alustetaan suodattimet...');
+        
+        // Filter checkboxes
+        const filterCheckboxes = {
+            'filter-vegan': 'vegan',
+            'filter-vegetarian': 'vegetarian', 
+            'filter-gluten-free': 'glutenFree',
+            'filter-lactose-free': 'lactoseFree'
+        };
+        
+        Object.entries(filterCheckboxes).forEach(([id, key]) => {
+            const checkbox = document.getElementById(id);
+            if (checkbox) {
+                checkbox.addEventListener('change', (e) => {
+                    appState.filters[key] = e.target.checked;
+                    console.log(`📋 Suodatin ${key}:`, e.target.checked);
+                });
+            }
+        });
+
+        // Allergen filter
+        const allergenSelect = document.getElementById('allergenFilter');
+        if (allergenSelect) {
+            allergenSelect.addEventListener('change', (e) => {
+                appState.filters.allergens = Array.from(e.target.selectedOptions).map(opt => opt.value);
+                console.log('🚫 Allergeenit:', appState.filters.allergens);
+            });
+        }
+
+        // Price range
+        const priceRange = document.getElementById('priceRange');
+        const maxPriceDisplay = document.getElementById('maxPrice');
+        if (priceRange && maxPriceDisplay) {
+            priceRange.addEventListener('input', (e) => {
+                appState.filters.maxPrice = parseInt(e.target.value);
+                maxPriceDisplay.textContent = appState.filters.maxPrice + '€';
+            });
+        }
+
+        // Apply filters button
+        const applyBtn = document.getElementById('applyFilters');
+        if (applyBtn) {
+            applyBtn.addEventListener('click', applyFilters);
+        }
+
+        // Clear filters button
+        const clearBtn = document.getElementById('clearFilters');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', clearFilters);
+        }
+    }
+
+    function applyFilters() {
+        console.log('🔧 Käytetään suodattimia:', appState.filters);
+        
+        appState.filteredMenu = appState.menu.filter(item => {
+            // Category filter
+            if (appState.currentCategory !== 'all' && item.category !== appState.currentCategory) {
+                return false;
+            }
+            
+            // Dietary filters
+            if (appState.filters.vegan && !item.vegan) return false;
+            if (appState.filters.vegetarian && !item.vegetarian) return false;
+            if (appState.filters.glutenFree && !item.glutenFree) return false;
+            if (appState.filters.lactoseFree && !item.lactoseFree) return false;
+            
+            // Price filter
+            if (item.price > appState.filters.maxPrice) return false;
+            
+            // Allergen filter
+            if (appState.filters.allergens.length > 0) {
+                const hasAllergen = appState.filters.allergens.some(allergen => 
+                    item.allergens && item.allergens.includes(allergen)
+                );
+                if (hasAllergen) return false;
+            }
+            
+            return true;
+        });
+        
+        renderMenu();
+        showNotification(`Suodattimet käytetty - ${appState.filteredMenu.length} tuotetta löytyi`, 'success');
+    }
+
+    function clearFilters() {
+        console.log('🧹 Tyhjennetään suodattimet');
+        
+        // Reset filter state
+        appState.filters = {
+            vegan: false,
+            vegetarian: false,
+            glutenFree: false,
+            lactoseFree: false,
+            allergens: [],
+            maxPrice: 50
+        };
+        
+        // Reset UI elements
+        document.querySelectorAll('#filters input[type="checkbox"]').forEach(cb => cb.checked = false);
+        
+        const allergenSelect = document.getElementById('allergenFilter');
+        if (allergenSelect) {
+            allergenSelect.selectedIndex = -1;
+        }
+        
+        const priceRange = document.getElementById('priceRange');
+        const maxPriceDisplay = document.getElementById('maxPrice');
+        if (priceRange && maxPriceDisplay) {
+            priceRange.value = 50;
+            maxPriceDisplay.textContent = '50€';
+        }
+        
+        // Reset menu
+        appState.filteredMenu = appState.menu;
+        renderMenu();
+        
+        showNotification('Suodattimet tyhjennetty', 'info');
+    }
+
+    // Menu functionality
+    function initializeMenu() {
+        console.log('🎯 Alustetaan ruokalista...');
+        
+        // Category buttons
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // Update active state
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                
+                // Update current category
+                appState.currentCategory = e.target.dataset.category;
+                console.log('📂 Kategoria vaihdettu:', appState.currentCategory);
+                
+                // Filter and render menu
+                filterByCategory();
+            });
+        });
+    }
+
+    function filterByCategory() {
+        if (appState.currentCategory === 'all') {
+            appState.filteredMenu = appState.menu;
+        } else {
+            appState.filteredMenu = appState.menu.filter(item => 
+                item.category === appState.currentCategory
+            );
+        }
+        renderMenu();
+    }
+
+    async function loadMenuData() {
+        console.log('📥 Ladataan ruokalistaa...');
+        const loadingElement = document.querySelector('.loading-spinner');
+        
+        try {
+            if (loadingElement) {
+                loadingElement.style.display = 'block';
+            }
+            
+            const menuData = await fetchTodayMenu();
+            console.log('📋 Ruokalista ladattu:', menuData.length, 'tuotetta');
+            
+            appState.menu = menuData.map(item => ({
+                ...item,
+                // Ensure Finnish translations
+                name: item.name_fi || item.name,
+                description: item.description_fi || item.description,
+                // Add default values
+                category: item.category || 'mains',
+                vegan: item.vegan || false,
+                vegetarian: item.vegetarian || false,
+                glutenFree: item.glutenFree || false,
+                lactoseFree: item.lactoseFree || false,
+                allergens: item.allergens || [],
+                ingredients: item.ingredients || []
+            }));
+            
+            appState.filteredMenu = appState.menu;
+            renderMenu();
+            
+        } catch (error) {
+            console.error('❌ Virhe ruokalistan lataamisessa:', error);
+            showNotification('Ruokalistan lataus epäonnistui', 'error');
+            
+            // Show error state
+            const menuGrid = document.getElementById('menuGrid');
+            if (menuGrid) {
+                menuGrid.innerHTML = `
+                    <div class="error-state">
+                        <div class="error-icon">😞</div>
+                        <h3>Ruokalistan lataus epäonnistui</h3>
+                        <p>Tarkista internetyhteytesi ja yritä uudelleen</p>
+                        <button class="btn primary" onclick="location.reload()">Yritä uudelleen</button>
+                    </div>
+                `;
+            }
+        } finally {
+            if (loadingElement) {
+                loadingElement.style.display = 'none';
+            }
+        }
+    }
+
+    function renderMenu() {
+        const menuGrid = document.getElementById('menuGrid');
+        if (!menuGrid) return;
+        
+        if (appState.filteredMenu.length === 0) {
+            menuGrid.innerHTML = `
+                <div class="empty-menu">
+                    <div class="empty-icon">🍽️</div>
+                    <h3>Ei tuotteita löytynyt</h3>
+                    <p>Kokeile erilaisia suodattimia tai hakuehtoja</p>
+                </div>
+            `;
+            return;
+        }
+        
+        menuGrid.innerHTML = appState.filteredMenu.map(item => `
+            <div class="menu-item" data-id="${item.id}">
+                <img src="${item.image || 'assets/img/placeholder.jpg'}" 
+                     alt="${escapeHtml(item.name)}" 
+                     class="menu-item-image"
+                     onerror="this.src='assets/img/placeholder.jpg'">
+                
+                <div class="menu-item-content">
+                    <div class="menu-item-header">
+                        <div>
+                            <h3 class="menu-item-title">${escapeHtml(item.name)}</h3>
+                            <div class="menu-item-price">${item.price.toFixed(2)} €</div>
+                        </div>
+                        <button class="favorite-btn ${appState.favorites.includes(item.id) ? 'active' : ''}" 
+                                onclick="toggleFavorite(${item.id})" 
+                                title="Lisää suosikkeihin">
+                            ❤️
+                        </button>
+                    </div>
+                    
+                    <p class="menu-item-description">${escapeHtml(item.description)}</p>
+                    
+                    <div class="menu-item-tags">
+                        ${item.vegan ? '<span class="menu-tag vegan">🌱 Vegaani</span>' : ''}
+                        ${item.vegetarian ? '<span class="menu-tag vegetarian">🥬 Kasvis</span>' : ''}
+                        ${item.glutenFree ? '<span class="menu-tag gluten-free">🌾 Gluteeniton</span>' : ''}
+                        ${item.lactoseFree ? '<span class="menu-tag lactose-free">🥛 Laktoositon</span>' : ''}
+                    </div>
+                    
+                    <div class="menu-item-actions">
+                        <button class="btn secondary" onclick="showItemDetails(${item.id})">
+                            Näytä tiedot
+                        </button>
+                        <button class="btn primary" onclick="addToCartFromMenu(${item.id})">
+                            Lisää koriin
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Cart functionality
+    function initializeCart() {
+        console.log('🎯 Alustetaan ostoskori...');
+        
+        const cartBtn = document.getElementById('cartBtn');
+        const cartSidebar = document.getElementById('cartSidebar');
+        const closeCartBtn = document.getElementById('closeCart');
+        const checkoutBtn = document.getElementById('checkoutBtn');
+        
+        if (cartBtn && cartSidebar) {
+            cartBtn.addEventListener('click', () => {
+                cartSidebar.classList.add('active');
+                document.getElementById('overlay').classList.add('active');
+                updateCartUI();
+            });
+        }
+        
+        if (closeCartBtn) {
+            closeCartBtn.addEventListener('click', closeCart);
+        }
+        
+        if (checkoutBtn) {
+            checkoutBtn.addEventListener('click', handleCheckout);
+        }
+        
+        // Close cart when clicking overlay
+        document.getElementById('overlay').addEventListener('click', closeCart);
+    }
+
+    function closeCart() {
+        document.getElementById('cartSidebar').classList.remove('active');
+        document.getElementById('overlay').classList.remove('active');
+    }
+
+    function updateCartUI() {
+        const cartCount = document.getElementById('cartCount');
+        const cartItems = document.getElementById('cartItems');
+        const cartTotal = document.getElementById('cartTotal');
+        const checkoutBtn = document.getElementById('checkoutBtn');
+        
+        const cart = loadCart();
+        const totalItems = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
+        const total = calculateCartTotal();
+        
+        if (cartCount) {
+            cartCount.textContent = totalItems;
+            cartCount.style.display = totalItems > 0 ? 'block' : 'none';
+        }
+        
+        if (cartTotal) {
+            cartTotal.textContent = total.toFixed(2) + ' €';
+        }
+        
+        if (checkoutBtn) {
+            checkoutBtn.disabled = totalItems === 0;
+        }
+        
+        if (cartItems) {
+            if (totalItems === 0) {
+                cartItems.innerHTML = `
+                    <div class="empty-cart">
+                        <div class="empty-cart-icon">🛒</div>
+                        <p>Ostoskorisi on tyhjä</p>
+                        <small>Lisää tuotteita ruokalistasta</small>
+                    </div>
+                `;
+            } else {
+                cartItems.innerHTML = Object.entries(cart).map(([itemId, quantity]) => {
+                    const item = appState.menu.find(m => m.id == itemId);
+                    if (!item) return '';
+                    
+                    return `
+                        <div class="cart-item">
+                            <img src="${item.image || 'assets/img/placeholder.jpg'}" 
+                                 alt="${escapeHtml(item.name)}" 
+                                 class="cart-item-image">
+                            <div class="cart-item-details">
+                                <h4>${escapeHtml(item.name)}</h4>
+                                <p class="cart-item-price">${item.price.toFixed(2)} €</p>
+                            </div>
+                            <div class="cart-item-controls">
+                                <button onclick="updateCartQuantity(${itemId}, ${quantity - 1})" class="qty-btn">-</button>
+                                <span class="quantity">${quantity}</span>
+                                <button onclick="updateCartQuantity(${itemId}, ${quantity + 1})" class="qty-btn">+</button>
+                            </div>
+                            <button onclick="removeFromCartCompletely(${itemId})" class="remove-btn" title="Poista korista">🗑️</button>
+                        </div>
+                    `;
+                }).filter(html => html).join('');
+            }
+        }
+    }
+
+    function calculateCartTotal() {
+        const cart = loadCart();
+        return Object.entries(cart).reduce((total, [itemId, quantity]) => {
+            const item = appState.menu.find(m => m.id == itemId);
+            return total + (item ? item.price * quantity : 0);
+        }, 0);
+    }
+
+    async function handleCheckout() {
+        if (!appState.user) {
+            showNotification('Kirjaudu sisään tehdäksesi tilauksen', 'info');
+            document.getElementById('userBtn').click(); // Open login form
+            return;
+        }
+        
+        const cart = loadCart();
+        const orderItems = Object.entries(cart).map(([itemId, quantity]) => ({
+            id: parseInt(itemId),
+            quantity
+        }));
+        
+        console.log('💳 Käsitellään tilaus:', orderItems);
+        
+        try {
+            document.getElementById('loadingIndicator').style.display = 'flex';
+            
+            const response = await postOrder(orderItems);
+            console.log('✅ Tilaus lähetetty:', response);
+            
+            clearCart();
+            updateCartUI();
+            closeCart();
+            
+            showNotification('Tilaus lähetetty onnistuneesti! Kiitos tilauksestasi.', 'success');
+            
+        } catch (error) {
+            console.error('❌ Virhe tilauksessa:', error);
+            showNotification('Tilauksen lähettäminen epäonnistui: ' + error.message, 'error');
+        } finally {
+            document.getElementById('loadingIndicator').style.display = 'none';
+        }
+    }
+
+    // Favorites functionality
+    function initializeFavorites() {
+        console.log('🎯 Alustetaan suosikit...');
+        
+        const favBtn = document.getElementById('favoritesBtn');
+        const favSidebar = document.getElementById('favoritesSidebar');
+        const closeFavBtn = document.getElementById('closeFavorites');
+        
+        if (favBtn && favSidebar) {
+            favBtn.addEventListener('click', () => {
+                favSidebar.classList.add('active');
+                document.getElementById('overlay').classList.add('active');
+                updateFavoritesUI();
+            });
+        }
+        
+        if (closeFavBtn) {
+            closeFavBtn.addEventListener('click', () => {
+                favSidebar.classList.remove('active');
+                document.getElementById('overlay').classList.remove('active');
+            });
+        }
+    }
+
+    function updateFavoritesUI() {
+        const favoritesList = document.getElementById('favoritesList');
+        if (!favoritesList) return;
+        
+        if (appState.favorites.length === 0) {
+            favoritesList.innerHTML = `
+                <div class="empty-favorites">
+                    <div class="empty-favorites-icon">❤️</div>
+                    <p>Ei suosikkeja vielä</p>
+                    <small>Lisää suosikkeja klikkaamalla sydäntä</small>
+                </div>
+            `;
+        } else {
+            favoritesList.innerHTML = appState.favorites.map(itemId => {
+                const item = appState.menu.find(m => m.id == itemId);
+                if (!item) return '';
+                
+                return `
+                    <div class="favorite-item">
+                        <img src="${item.image || 'assets/img/placeholder.jpg'}" 
+                             alt="${escapeHtml(item.name)}" 
+                             class="favorite-item-image">
+                        <div class="favorite-item-details">
+                            <h4>${escapeHtml(item.name)}</h4>
+                            <p class="favorite-item-price">${item.price.toFixed(2)} €</p>
+                        </div>
+                        <div class="favorite-item-actions">
+                            <button onclick="addToCartFromMenu(${itemId})" class="btn primary small">Lisää koriin</button>
+                            <button onclick="toggleFavorite(${itemId})" class="btn secondary small">Poista</button>
+                        </div>
+                    </div>
+                `;
+            }).filter(html => html).join('');
+        }
+    }
+
+    // Authentication functionality
+    function initializeAuth() {
+        console.log('🎯 Alustetaan autentikointi...');
+        
+        const userBtn = document.getElementById('userBtn');
+        const userDropdown = document.getElementById('userDropdown');
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const adminBtn = document.getElementById('adminBtn');
+        
+        if (userBtn && userDropdown) {
+            userBtn.addEventListener('click', () => {
+                userDropdown.classList.toggle('active');
+            });
+        }
+        
+        if (loginBtn) {
+            loginBtn.addEventListener('click', handleLogin);
+        }
+        
+        if (registerBtn) {
+            registerBtn.addEventListener('click', handleRegister);
+        }
+        
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', handleLogout);
+        }
+        
+        if (adminBtn) {
+            adminBtn.addEventListener('click', () => {
+                window.open('/admin.html', '_blank');
+            });
+        }
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!userBtn.contains(e.target) && !userDropdown.contains(e.target)) {
+                userDropdown.classList.remove('active');
+            }
+        });
+    }
+
+    async function handleLogin() {
+        const email = document.getElementById('authEmail').value.trim();
+        const password = document.getElementById('authPassword').value;
+        
+        if (!email || !password) {
+            showNotification('Täytä kaikki kentät', 'error');
+            return;
+        }
+        
+        try {
+            document.getElementById('loadingIndicator').style.display = 'flex';
+            
+            const response = await loginUser(email, password);
+            console.log('✅ Kirjautuminen onnistui:', response);
+            
+            localStorage.setItem('jwt_token', response.token);
+            appState.user = response.user;
+            
+            updateAuthUI();
+            document.getElementById('userDropdown').classList.remove('active');
+            
+            showNotification(`Tervetuloa takaisin, ${response.user.name}!`, 'success');
+            
+        } catch (error) {
+            console.error('❌ Kirjautumisvirhe:', error);
+            showNotification('Kirjautuminen epäonnistui: ' + error.message, 'error');
+        } finally {
+            document.getElementById('loadingIndicator').style.display = 'none';
+        }
+    }
+
+    async function handleRegister() {
+        const name = document.getElementById('authName').value.trim();
+        const email = document.getElementById('authEmail').value.trim();
+        const password = document.getElementById('authPassword').value;
+        const isStudent = document.getElementById('authStudent').checked;
+        
+        if (!name || !email || !password) {
+            showNotification('Täytä kaikki kentät rekisteröitymistä varten', 'error');
+            return;
+        }
+        
+        if (password.length < 6) {
+            showNotification('Salasanan tulee olla vähintään 6 merkkiä pitkä', 'error');
+            return;
+        }
+        
+        try {
+            document.getElementById('loadingIndicator').style.display = 'flex';
+            
+            const response = await registerUser(name, email, password, isStudent);
+            console.log('✅ Rekisteröityminen onnistui:', response);
+            
+            localStorage.setItem('jwt_token', response.token);
+            appState.user = response.user;
+            
+            updateAuthUI();
+            document.getElementById('userDropdown').classList.remove('active');
+            
+            showNotification(`Tervetuloa, ${response.user.name}! Tilisi on luotu.`, 'success');
+            
+        } catch (error) {
+            console.error('❌ Rekisteröitymisvirhe:', error);
+            showNotification('Rekisteröityminen epäonnistui: ' + error.message, 'error');
+        } finally {
+            document.getElementById('loadingIndicator').style.display = 'none';
+        }
+    }
+
+    function handleLogout() {
+        localStorage.removeItem('jwt_token');
+        appState.user = null;
+        updateAuthUI();
+        showNotification('Kirjauduit ulos onnistuneesti', 'info');
+    }
+
+    function checkAuthStatus() {
+        const token = localStorage.getItem('jwt_token');
+        if (token) {
+            // Here you would typically verify the token with the server
+            // For now, we'll just assume it's valid if it exists
+            console.log('🔐 JWT token löytyi, käyttäjä todennäköisesti kirjautunut');
+            // You might want to decode the token to get user info
+        }
+        updateAuthUI();
+    }
+
+    function updateAuthUI() {
+        const authForm = document.getElementById('authForm');
+        const userInfo = document.getElementById('userInfo');
+        const adminBtn = document.getElementById('adminBtn');
+        
+        if (appState.user) {
+            if (authForm) authForm.style.display = 'none';
+            if (userInfo) {
+                userInfo.style.display = 'block';
+                const userName = document.getElementById('userName');
+                if (userName) {
+                    userName.textContent = appState.user.name;
+                }
+            }
+            
+            // Show admin button if user is admin
+            if (adminBtn && appState.user.role === 'admin') {
+                adminBtn.style.display = 'block';
+            }
+        } else {
+            if (authForm) authForm.style.display = 'block';
+            if (userInfo) userInfo.style.display = 'none';
+            if (adminBtn) adminBtn.style.display = 'none';
+        }
+    }
+
+    // Global helper functions
+    window.toggleFavorite = function(itemId) {
+        const index = appState.favorites.indexOf(itemId);
+        if (index > -1) {
+            appState.favorites.splice(index, 1);
+            showNotification('Poistettu suosikeista', 'info');
+        } else {
+            appState.favorites.push(itemId);
+            showNotification('Lisätty suosikkeihin', 'success');
+        }
+        
+        localStorage.setItem('favorites', JSON.stringify(appState.favorites));
+        
+        // Update UI
+        renderMenu();
+        updateFavoritesUI();
+    };
+
+    window.addToCartFromMenu = function(itemId) {
+        addToCart(itemId, 1);
+        updateCartUI();
+        
+        const item = appState.menu.find(m => m.id == itemId);
+        if (item) {
+            showNotification(`${item.name} lisätty koriin`, 'success');
+        }
+    };
+
+    window.updateCartQuantity = function(itemId, newQuantity) {
+        if (newQuantity <= 0) {
+            removeFromCart(itemId);
+        } else {
+            updateQty(itemId, newQuantity);
+        }
+        updateCartUI();
+    };
+
+    window.removeFromCartCompletely = function(itemId) {
+        removeFromCart(itemId);
+        updateCartUI();
+        
+        const item = appState.menu.find(m => m.id == itemId);
+        if (item) {
+            showNotification(`${item.name} poistettu korista`, 'info');
+        }
+    };
+
+    window.showItemDetails = function(itemId) {
+        const item = appState.menu.find(m => m.id == itemId);
+        if (!item) return;
+        
+        // Create modal for item details
+        const modal = document.createElement('div');
+        modal.className = 'item-detail-modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>${escapeHtml(item.name)}</h2>
+                    <button class="close-btn" onclick="this.closest('.item-detail-modal').remove()">×</button>
+                </div>
+                <div class="modal-body">
+                    <img src="${item.image || 'assets/img/placeholder.jpg'}" alt="${escapeHtml(item.name)}" class="item-detail-image">
+                    <div class="item-detail-info">
+                        <p class="item-description">${escapeHtml(item.description)}</p>
+                        <div class="item-price">${item.price.toFixed(2)} €</div>
+                        <div class="item-tags">
+                            ${item.vegan ? '<span class="tag vegan">🌱 Vegaani</span>' : ''}
+                            ${item.vegetarian ? '<span class="tag vegetarian">🥬 Kasvis</span>' : ''}
+                            ${item.glutenFree ? '<span class="tag gluten-free">🌾 Gluteeniton</span>' : ''}
+                            ${item.lactoseFree ? '<span class="tag lactose-free">🥛 Laktoositon</span>' : ''}
+                        </div>
+                        ${item.ingredients && item.ingredients.length > 0 ? `
+                            <div class="ingredients">
+                                <h4>Ainekset:</h4>
+                                <p>${item.ingredients.map(ing => escapeHtml(ing)).join(', ')}</p>
+                            </div>
+                        ` : ''}
+                        ${item.allergens && item.allergens.length > 0 ? `
+                            <div class="allergens">
+                                <h4>⚠️ Allergeenit:</h4>
+                                <p>${item.allergens.map(all => escapeHtml(all)).join(', ')}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn secondary" onclick="this.closest('.item-detail-modal').remove()">Sulje</button>
+                    <button class="btn primary" onclick="addToCartFromMenu(${itemId}); this.closest('.item-detail-modal').remove();">Lisää koriin</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+    };
+
+    console.log('✅ Apricus-sovellus käynnistetty onnistuneesti!');
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-  // تفعيل الفلاتر الحديثة
-  if (selectors.applyFilters) {
-    selectors.applyFilters.addEventListener('click', function() {
-      const vegan = selectors.filterVegan.checked;
-      const gluten = selectors.filterGluten.checked;
-      const lactose = selectors.filterLactose.checked;
-      const allergens = Array.from(selectors.excludeAllergens.selectedOptions).map(opt => opt.value);
+// Utility functions
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
 
-      let filtered = state.menu;
-      if (vegan) filtered = filtered.filter(d => d.vegan);
-      if (gluten) filtered = filtered.filter(d => d.gluten_free);
-      if (lactose) filtered = filtered.filter(d => d.lactose_free);
-
-      if (allergens.length) {
-        filtered = filtered.filter(d => {
-          // Example: d.allergens = ['nuts', 'milk']
-          if (!d.allergens) return true;
-          return !d.allergens.some(a => allergens.includes(a));
-        });
-      }
-      renderMenu(filtered);
-    });
-  }
-  // تعريف state عالمي إذا لم يكن موجوداً
-  if (!window.state) window.state = {};
-  const state = window.state;
-
-  // تحميل قائمة الأطباق من API أو بيانات ثابتة
-  async function loadMenu() {
-    try {
-      // إذا كان لديك API حقيقي استخدمه هنا
-      // const res = await fetch('/api/menu/today');
-      // const data = await res.json();
-      // state.menu = data.menu;
-      // مثال بيانات ثابتة:
-      state.menu = [
-        { id: 1, name_ar: 'كبسة', name_en: 'Kabsa', available: true, vegan: false, gluten_free: true, lactose_free: true, image_url: '/assets/img/food-bg.jpg', description: 'طبق أرز سعودي تقليدي.' },
-        { id: 2, name_ar: 'سلطة', name_en: 'Salad', available: true, vegan: true, gluten_free: true, lactose_free: true, image_url: '/assets/img/salati.jpg', description: 'سلطة خضار طازجة.' }
-      ];
-      renderMenu();
-    } catch(e) {
-      selectors.menu.innerHTML = '<p style="color:#c0392b">Virhe ladattaessa ruokalistaa</p>';
-    }
-  }
-  loadMenu();
-
-  // البحث في الهيدر (يعمل فقط بعد تحميل القائمة)
-  const headerSearchInput = document.getElementById('headerSearch');
-  const headerSearchIcon = document.querySelector('.search-icon');
-  function filterMenuByHeaderSearch() {
-    const val = (headerSearchInput.value || '').trim().toLowerCase();
-    if (!state.menu) return;
-    if (!val) {
-      renderMenu();
-      return;
-    }
-    const filtered = state.menu.filter(d => {
-      return (
-        (d.name_ar && d.name_ar.toLowerCase().includes(val)) ||
-        (d.name_en && d.name_en.toLowerCase().includes(val)) ||
-        (d.description && d.description.toLowerCase().includes(val))
-      );
-    });
-    renderMenu(filtered);
-  }
-  // انتظر تحميل القائمة ثم فعّل البحث
-  function enableHeaderSearchWhenMenuReady() {
-    if(state.menu && Array.isArray(state.menu)) {
-      if(headerSearchInput) headerSearchInput.addEventListener('input', filterMenuByHeaderSearch);
-      if(headerSearchIcon) headerSearchIcon.addEventListener('click', filterMenuByHeaderSearch);
-    } else {
-      setTimeout(enableHeaderSearchWhenMenuReady, 200);
-    }
-  }
-  enableHeaderSearchWhenMenuReady();
-  // تفاعل قائمة الدخول المنسدلة
-  const btnLogin = document.getElementById('btnLogin');
-  const authDropdown = document.getElementById('authDropdown');
-  if(btnLogin && authDropdown) {
-    btnLogin.addEventListener('click', function(e) {
-      e.stopPropagation();
-      // لا تكرر الفتح إذا كانت مفتوحة
-      if(authDropdown.style.display === 'block') return;
-      authDropdown.style.display = 'block';
-      // تركيز أول حقل
-      const firstInput = authDropdown.querySelector('input');
-      if(firstInput) setTimeout(()=>firstInput.focus(), 100);
-    });
-    // إغلاق القائمة عند الضغط خارجها فقط
-    document.addEventListener('mousedown', function(e) {
-      if(authDropdown.style.display === 'block' && !btnLogin.contains(e.target) && !authDropdown.contains(e.target)) {
-        authDropdown.style.display = 'none';
-      }
-    });
-    // إغلاق بالضغط على Escape
-    document.addEventListener('keydown', function(e) {
-      if(e.key === 'Escape' && authDropdown.style.display === 'block') {
-        authDropdown.style.display = 'none';
-      }
-    });
-  }
-  // دالة تحديث واجهة المستخدم بعد تسجيل الدخول/الخروج
-  function updateUserUI() {
-    const token = localStorage.getItem('jwt_token');
-    const userInfo = document.getElementById('userInfo');
-    const userName = document.getElementById('userName');
-    const btnLogin = document.getElementById('btnLogin');
-    if(token) {
-      // استخراج بيانات المستخدم من التوكن (بدون تحقق أمان كامل)
-      let payload = {};
-      try { payload = JSON.parse(atob(token.split('.')[1])); } catch(e){}
-      if(userInfo && userName) {
-        userName.textContent = payload.name || payload.email || 'مستخدم';
-        userInfo.style.display = 'flex';
-      }
-      if(btnLogin) btnLogin.style.display = 'none';
-    } else {
-      if(userInfo) userInfo.style.display = 'none';
-      if(btnLogin) btnLogin.style.display = '';
-    }
-  }
-
-  // زر تسجيل الخروج
-  const btnLogout = document.getElementById('btnLogout');
-  if(btnLogout) {
-    btnLogout.addEventListener('click', function() {
-      localStorage.removeItem('jwt_token');
-      updateUserUI();
-  alert('Uloskirjautuminen onnistui');
-    });
-  }
-
-  // تحديث الواجهة عند تحميل الصفحة وبعد تسجيل الدخول/التسجيل
-  updateUserUI();
-
-  // ربط واجهة التسجيل/الدخول مع backend
-  async function handleRegister(e) {
-    e.preventDefault();
-    const name = document.getElementById('authName').value.trim();
-    const email = document.getElementById('authEmail').value.trim();
-    const password = document.getElementById('authPassword').value;
-    try {
-      const res = await window.registerUser({ name, email, password });
-      if(res.token) {
-        localStorage.setItem('jwt_token', res.token);
-        alert('تم التسجيل بنجاح!');
-        selectors.authModal.setAttribute('aria-hidden','true');
-        updateUserUI();
-      } else {
-        alert(res.error || 'حدث خطأ بالتسجيل');
-      }
-    } catch(err) { alert('خطأ في الاتصال بالخادم'); }
-  }
-
-  async function handleLogin(e) {
-    e.preventDefault();
-    const email = document.getElementById('authEmail').value.trim();
-    const password = document.getElementById('authPassword').value;
-    try {
-      const res = await window.loginUser({ email, password });
-      if(res.token) {
-        localStorage.setItem('jwt_token', res.token);
-        alert('تم تسجيل الدخول بنجاح!');
-        selectors.authModal.setAttribute('aria-hidden','true');
-        updateUserUI();
-      } else {
-        alert(res.error || 'بيانات الدخول غير صحيحة');
-      }
-    } catch(err) { alert('خطأ في الاتصال بالخادم'); }
-  }
-
-  if(selectors.btnRegister) selectors.btnRegister.addEventListener('click', handleRegister);
-  if(selectors.btnDoLogin) selectors.btnDoLogin.addEventListener('click', handleLogin);
-  // دالة عرض تفاصيل السلة
-  function renderCartDetails() {
-    const { cartItems, cartTotal, cartCount } = selectors;
-    const cart = window.loadCart ? window.loadCart() : [];
-    cartItems.innerHTML = '';
-    if (!cart.length) {
-    cartItems.innerHTML = '<p style="text-align:center;color:#a67c1a">Ostoskori on tyhjä</p>';
-      cartTotal.textContent = '0.00';
-      cartCount.textContent = '0';
-      return;
-    }
-    cart.forEach(item => {
-      const div = document.createElement('div');
-      div.className = 'cart-item-row';
-      div.innerHTML = `
-        <img src="${item.image||item.image_url||'assets/img/placeholder.jpg'}" alt="صورة" class="cart-item-img" />
-        <div class="cart-item-info">
-          <div class="cart-item-name">${item.name}</div>
-          <div class="cart-item-price">${(item.price||0).toFixed(2)} €</div>
-          <div class="cart-item-qty">
-            <button class="qty-btn minus" data-id="${item.id}">-</button>
-            <span>${item.qty}</span>
-            <button class="qty-btn plus" data-id="${item.id}">+</button>
-          </div>
-        </div>
-        <button class="remove-btn" data-id="${item.id}">×</button>
-      `;
-      cartItems.appendChild(div);
-    });
-    cartTotal.textContent = (window.cartTotal ? window.cartTotal(cart) : 0).toFixed(2);
-    cartCount.textContent = cart.reduce((s,i)=>s+i.qty,0);
-  }
-
-  // تحديث تفاصيل السلة عند فتحها أو عند إضافة/تعديل
-  if(selectors.btnCart && selectors.cartDrawer) {
-    selectors.btnCart.addEventListener('click', renderCartDetails);
-  }
-
-  // تفاعل أزرار الكمية والحذف
-  selectors.cartItems.addEventListener('click', function(e) {
-    if(e.target.classList.contains('remove-btn')) {
-      if(window.removeFromCart) {
-        window.removeFromCart(e.target.dataset.id);
-        renderCartDetails();
-      }
-    }
-    if(e.target.classList.contains('plus')) {
-      if(window.updateQty) {
-        const id = e.target.dataset.id;
-        const cart = window.loadCart();
-        const it = cart.find(i=>i.id==id);
-        window.updateQty(id, (it.qty||1)+1);
-        renderCartDetails();
-      }
-    }
-    if(e.target.classList.contains('minus')) {
-      if(window.updateQty) {
-        const id = e.target.dataset.id;
-        const cart = window.loadCart();
-        const it = cart.find(i=>i.id==id);
-        if(it.qty>1) window.updateQty(id, (it.qty||1)-1);
-        renderCartDetails();
-      }
-    }
-  });
-
-  // تحديث السلة عند إضافة منتج
-  selectors.menu.addEventListener('click', function(e) {
-    if(e.target.classList.contains('add')) {
-      setTimeout(renderCartDetails, 300);
-    }
-  });
-  // تفاعل drawer للسلة
-  if(selectors.btnCart && selectors.cartDrawer) {
-    selectors.btnCart.addEventListener('click', function() {
-
-    // تفاعل أيقونة تسجيل الدخول
-    const btnLogin = document.getElementById('btnLogin');
-    if(btnLogin && selectors.authModal) {
-      btnLogin.addEventListener('click', function() {
-        selectors.authModal.removeAttribute('aria-hidden');
-        selectors.authModal.removeAttribute('inert');
-        btnLogin.classList.add('animated');
-        setTimeout(()=>btnLogin.classList.remove('animated'), 400);
-      });
-    }
-      selectors.cartDrawer.setAttribute('aria-hidden', 'false');
-      selectors.cartDrawer.classList.add('open');
-      selectors.btnCart.classList.add('animated');
-      setTimeout(()=>selectors.btnCart.classList.remove('animated'), 400);
-    });
-    // إغلاق drawer عند الضغط خارجها أو زر دفع
-    document.addEventListener('click', function(e) {
-      if(selectors.cartDrawer.getAttribute('aria-hidden')==='false') {
-        if(e.target === selectors.cartDrawer || e.target === selectors.btnCheckout) {
-          selectors.cartDrawer.setAttribute('aria-hidden', 'true');
-          selectors.cartDrawer.classList.remove('open');
+// Global notification function
+function showNotification(message, type = 'info') {
+    // Remove existing notifications
+    document.querySelectorAll('.notification').forEach(n => n.remove());
+    
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <span>${message}</span>
+        <button onclick="this.parentElement.remove()" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; margin-left: 1rem;">×</button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (notification.parentElement) {
+            notification.remove();
         }
-      }
-    });
-  }
-  // تفاعل drawer للمفضلة
-  const btnFavorites = document.getElementById('btnFavorites');
-  if(btnFavorites && selectors.favDrawer) {
-    btnFavorites.addEventListener('click', function() {
-      selectors.favDrawer.setAttribute('aria-hidden', 'false');
-      btnFavorites.classList.add('animated');
-      setTimeout(()=>btnFavorites.classList.remove('animated'), 400);
-    });
-    document.addEventListener('click', function(e) {
-      if(selectors.favDrawer.getAttribute('aria-hidden')==='false') {
-        if(e.target === selectors.favDrawer) {
-          selectors.favDrawer.setAttribute('aria-hidden', 'true');
+    }, 5000);
+    
+    // Add slide-out animation before removal
+    setTimeout(() => {
+        if (notification.parentElement) {
+            notification.style.transform = 'translateX(100%)';
+            notification.style.opacity = '0';
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 300);
         }
-      }
-    });
-  }
+    }, 4700);
+}
 
-  // أنيميشن عند إضافة للسلة
-  selectors.menu.addEventListener('click', function(e) {
-    if(e.target.classList.contains('add')) {
-      selectors.btnCart.classList.add('animated');
-      setTimeout(()=>selectors.btnCart.classList.remove('animated'), 400);
-    }
-    if(e.target.classList.contains('fav')) {
-      if(btnFavorites) {
-        btnFavorites.classList.add('animated');
-        setTimeout(()=>btnFavorites.classList.remove('animated'), 400);
-      }
-    }
-  });
-  const userBtn = document.querySelector('.user-btn');
-  if(userBtn && selectors.authModal) {
-    userBtn.addEventListener('click', function() {
-      selectors.authModal.removeAttribute('aria-hidden');
-      selectors.authModal.removeAttribute('inert');
-    });
-  }
-
-  const btnDirections = document.getElementById('btnDirections');
-  if (btnDirections) {
-    btnDirections.addEventListener('click', function() {
-      // Replace with your actual address if needed
-      const address = 'Makuja-katu 12, Kaupunki';
-      const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
-      window.open(url, '_blank');
-    });
-  }
-});
+console.log('📱 Apricus - Main.js ladattu onnistuneesti!');

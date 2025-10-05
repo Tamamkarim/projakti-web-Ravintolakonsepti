@@ -1,154 +1,461 @@
-<!doctype html>
-<html lang="fi">
+<!DOCTYPE html>
+<html lang="fi" dir="ltr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Mood_Corridor</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#c0392b">
-  <link rel="stylesheet" href="css/styles.css">
-  <link rel="icon" type="image/png" href="assets/img/logo.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apricus - Kahvila & Ravintola | Ainutlaatuisia makuelämyksiä</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#c0392b">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="icon" type="image/png" href="assets/img/logo.png">
+    <meta name="description" content="Apricus - Ainutlaatuinen kahvila ja ravintola kokemuksia Suomessa">
 </head>
-<body dir="rtl" class="page">
-  <header class="custom-header">
-    <div class="header-actions">
-    <div class="search-box">
-  <input type="text" id="headerSearch" placeholder="Hae ruokalajia..." />
-        <span class="search-icon">
-          <svg width="20" height="20" fill="none" stroke="#e1701a" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        </span>
-      </div>
-  <div class="icon-btn cart-btn" id="btnCart">
-        <svg width="22" height="22" fill="none" stroke="#e1701a" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-        <span class="cart-badge" id="cartCount">0</span>
-      </div>
-      <div class="icon-btn fav-btn" id="btnFavorites">
-        <svg width="22" height="22" fill="none" stroke="#e1701a" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-      </div>
-  <div class="icon-btn login-btn" id="btnLogin" title="Kirjaudu / Rekisteröidy">
-        <svg width="28" height="28" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="userGradient" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#e1701a"/>
-              <stop offset="1" stop-color="#eac17a"/>
-            </linearGradient>
-          </defs>
-          <circle cx="24" cy="24" r="22" fill="url(#userGradient)" stroke="#fff" stroke-width="2"/>
-          <circle cx="24" cy="20" r="7" fill="#fff"/>
-          <path d="M36 38c0-6-5.37-10-12-10s-12 4-12 10" fill="#fff"/>
-        </svg>
-        <div id="authDropdown" class="auth-dropdown" style="display:none;">
-          <form id="authForm" style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;min-width:220px;padding:12px 8px;">
-            <input id="authName" placeholder="Nimi (rekisteröinti)" />
-            <input id="authEmail" placeholder="Sähköposti" />
-            <input id="authPassword" type="password" placeholder="Salasana" />
-            <label style="font-size:0.95em"><input type="checkbox" id="authStudent" /> Opiskelija (alennus)</label>
-            <div style="display:flex;gap:6px;justify-content:flex-end;width:100%">
-              <button type="button" id="btnDoLogin" class="btn">Kirjaudu</button>
-              <button type="button" id="btnRegister" class="btn">Rekisteröidy</button>
+<body class="modern-page">
+    <!-- Navigation Header -->
+    <header class="modern-header">
+        <div class="header-container">
+            <!-- Logo Section -->
+            <div class="logo-section">
+                <img src="assets/img/logo.png" alt="Apricus Logo" class="logo">
+                <span class="brand-text">TK</span>
             </div>
-          </form>
+
+            <!-- Navigation Menu -->
+            <nav class="main-navigation">
+                <a href="#etusivu" class="nav-link">Etusivu</a>
+                <a href="#menu" class="nav-link">Ruokalista</a>
+                <a href="#tietoa" class="nav-link">Tietoa </a>
+                <a href="#yhteystiedot" class="nav-link">Yhteystiedot</a>
+            </nav>
+
+            <!-- Action Buttons -->
+            <div class="header-actions">
+                <!-- Search -->
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Etsi ruokia..." class="search-input">
+                    <button class="search-btn" id="searchBtn">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Cart Button -->
+                <button class="action-btn cart-btn" id="cartBtn">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <circle cx="9" cy="21" r="1"/>
+                        <circle cx="20" cy="21" r="1"/>
+                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                    </svg>
+                    <span class="cart-count" id="cartCount">0</span>
+                </button>
+
+                <!-- Favorites Button -->
+                <button class="action-btn favorites-btn" id="favoritesBtn">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                </button>
+
+                <!-- User Menu -->
+                <div class="user-menu">
+                    <button class="action-btn user-btn" id="userBtn">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </button>
+                    
+                    <!-- Login/Register Form -->
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="auth-form" id="authForm">
+                            <h3>Kirjaudu sisään</h3>
+                            <input type="text" id="authName" placeholder="Nimi (vain rekisteröinti)" class="form-input">
+                            <input type="email" id="authEmail" placeholder="Sähköposti" class="form-input" required>
+                            <input type="password" id="authPassword" placeholder="Salasana" class="form-input" required>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="authStudent">
+                                <span>Opiskelija (saat alennuksia)</span>
+                            </label>
+                            <div class="auth-buttons">
+                                <button type="button" id="loginBtn" class="btn primary">Kirjaudu</button>
+                                <button type="button" id="registerBtn" class="btn secondary">Rekisteröidy</button>
+                            </div>
+                        </div>
+                        
+                        <!-- User Info (shown when logged in) -->
+                        <div class="user-info" id="userInfo" style="display: none;">
+                            <div class="user-greeting">
+                                <span>Tervetuloa, <strong id="userName"></strong>!</span>
+                            </div>
+                            <div class="user-actions">
+                                <button id="adminBtn" class="btn admin-btn" style="display: none;">
+                                    ⚙️ Hallintapaneeli
+                                </button>
+                                <button id="logoutBtn" class="btn secondary">Kirjaudu ulos</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
-      </div>
-      <div class="user-info" id="userInfo" style="display:none">
-        <span id="userName" style="font-weight:bold;color:#e1701a"></span>
-        <button id="btnLogout" class="btn" style="margin-right:8px;padding:4px 12px;font-size:0.95em">Kirjaudu ulos</button>
-      </div>
-    </div>
-    <nav class="header-nav">
-  <a href="#" class="nav-link">Etusivu</a>
-  <a href="#" class="nav-link">Tietoa</a>
-  <a href="#" class="nav-link">Ruokalista</a>
-  <a href="#" class="nav-link">Galleria</a>
-  <a href="#" class="nav-link">Blogi</a>
-  <a href="#" class="nav-link">Yhteystiedot</a>
-    </nav>
-    <div class="header-logo-brand">
-      <img src="assets/img/logo.png" alt="Logo" class="header-logo" />
-      <span class="header-brand">TK</span>
-    </div>
-  </header>
-  <div class="header-image">
-  <img src="assets/img/Asil.jpg" alt="Tervetuloa kuva" class="hero-img" />
-    <div class="hero-text">
-  <h1>Apricus</h1>
-  <h2>Kahvila & Ravintola</h2>
-    </div>
-  </div>
-   
-      
-   
-  </header>
+    </header>
 
-
-
-  <main class="container">
-    <section class="controls">
-  <div class="filters new-filters">
-    <div class="filter-group">
-      <label class="filter-label"><input type="checkbox" id="filter-vegan" /> Vegaani</label>
-      <label class="filter-label"><input type="checkbox" id="filter-gluten" /> Gluteeniton</label>
-      <label class="filter-label"><input type="checkbox" id="filter-lactose" /> Laktoositon</label>
-    </div>
-    <div class="filter-group">
-      <label class="filter-label">Poista allergeenit:
-        <select id="exclude-allergens" multiple>
-          <option value="nuts">Pähkinät</option>
-          <option value="fish">Kala</option>
-          <option value="milk">Maito</option>
-          <option value="eggs">Kananmuna</option>
-        </select>
-      </label>
-    </div>
-    <button id="applyFilters" class="btn filter-btn">Käytä</button>
-  </div>
-</section>
-
-    <section id="promotions" class="promotions"></section>
-
-    <section id="menu" class="menu-grid" aria-live="polite">
-      <!-- Dishes will be rendered here -->
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-background">
+            <img src="assets/img/Asil.jpg" alt="Apricus ravintola" class="hero-image">
+            <div class="hero-overlay"></div>
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title">Tervetuloa Apricukseen</h1>
+            <p class="hero-subtitle">Ainutlaatuisia makuelämyksiä sydämessä kaupunkia</p>
+            <div class="hero-actions">
+                <button class="btn primary large" onclick="scrollToMenu()">Tutustu ruokalistaan</button>
+                <button class="btn secondary large" onclick="scrollToAbout()">Lue lisää</button>
+            </div>
+        </div>
     </section>
-  </main>
 
-  <!-- Cart drawer -->
-  <aside id="cartDrawer" class="drawer" aria-hidden="true">
-  <h2>Ostoskori</h2>
-    <div id="cartItems"></div>
-    <div class="cart-summary">
-  <div>Yhteensä: <span id="cartTotal">0.00</span></div>
-  <button id="btnCheckout" class="btn primary">Maksa</button>
-    </div>
-  </aside>
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Filters Section -->
+        <section class="filters-section" id="filters">
+            <div class="container">
+                <h2>Suodata ruokia</h2>
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <h3>Ruokavalio</h3>
+                        <div class="filter-options">
+                            <label class="filter-option">
+                                <input type="checkbox" id="filter-vegan">
+                                <span class="checkmark"></span>
+                                🌱 Vegaani
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" id="filter-vegetarian">
+                                <span class="checkmark"></span>
+                                🥬 Kasvisruoka
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" id="filter-gluten-free">
+                                <span class="checkmark"></span>
+                                🌾 Gluteeniton
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" id="filter-lactose-free">
+                                <span class="checkmark"></span>
+                                🥛 Laktoositon
+                            </label>
+                        </div>
+                    </div>
 
-  <!-- Favorites drawer -->
-  <aside id="favDrawer" class="drawer" aria-hidden="true">
-  <h2>Suosikit</h2>
-    <div id="favList"></div>
-  </aside>
+                    <div class="filter-group">
+                        <h3>Allergeenit (poissulje)</h3>
+                        <select id="allergenFilter" multiple class="allergen-select">
+                            <option value="nuts">🥜 Pähkinät</option>
+                            <option value="fish">🐟 Kala</option>
+                            <option value="shellfish">🦐 Äyriäiset</option>
+                            <option value="eggs">🥚 Kananmunat</option>
+                            <option value="soy">🌱 Soija</option>
+                        </select>
+                    </div>
 
-  <!-- Login modal -->
+                    <div class="filter-group">
+                        <h3>Hintaluokka</h3>
+                        <div class="price-range">
+                            <input type="range" id="priceRange" min="0" max="50" value="50" class="price-slider">
+                            <div class="price-display">
+                                <span>0€</span>
+                                <span id="maxPrice">50€</span>
+                            </div>
+                        </div>
+                    </div>
 
-  
-    <div class="footer-content">
-      <div class="footer-info">
-        <h3>Apricus Kahvila & Ravintola</h3>
-        <p>Aukioloajat: 10:00–23:00</p>
-       <div>Osoite: Makuja-katu 12, Kaupunki</div>
-  <div><button id="btnDirections" class="btn">Hae reittiohjeet</button></div>
-      </div>
-      <div class="footer-contact">
-        <p>Puhelin: <a href="tel:+358123456789">+358 12 345 6789</a></p>
-        <p>Sähköposti: <a href="mailto:info@apricus.fi">info@apricus.fi</a></p>
-        <div class="footer-social">
-          <a href="#" title="Instagram" class="social-icon">&#x1F4F7;</a>
-          <a href="#" title="Facebook" class="social-icon">&#x1F426;</a>
+                    <div class="filter-actions">
+                        <button id="applyFilters" class="btn primary">Käytä suodattimet</button>
+                        <button id="clearFilters" class="btn secondary">Tyhjennä</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Menu Section -->
+        <section class="menu-section" id="menu">
+            <div class="container">
+                <h2>Tämän päivän ruokalista</h2>
+                <div class="menu-categories">
+                    <button class="category-btn active" data-category="all">Kaikki</button>
+                    <button class="category-btn" data-category="appetizers">Alkuruoat</button>
+                    <button class="category-btn" data-category="mains">Pääruoat</button>
+                    <button class="category-btn" data-category="desserts">Jälkiruoat</button>
+                    <button class="category-btn" data-category="drinks">Juomat</button>
+                </div>
+                
+                <div class="menu-grid" id="menuGrid">
+                    <!-- Menu items will be loaded here -->
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                        <p>Ladataan ruokalistaa...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="about-section" id="tietoa">
+            <div class="container">
+                <div class="about-grid">
+                    <div class="about-text">
+                        <h2>Tarinmme</h2>
+                        <p>Apricus on syntynyt rakkaudesta hyvään ruokaan ja lämpimään vieraanvaraisuuteen. Tarjoamme ainutlaatuisia makuelämyksiä sydämessä kaupunkia.</p>
+                        <p>Käytämme vain tuoreimpia, paikallisia raaka-aineita ja perinteisiä reseptejä modernilla twistillä.</p>
+                        <div class="features">
+                            <div class="feature">
+                                <div class="feature-icon">🌱</div>
+                                <h3>Tuoreet raaka-aineet</h3>
+                                <p>Paikalliset ja sesongin mukaiset ainekset</p>
+                            </div>
+                            <div class="feature">
+                                <div class="feature-icon">👨‍🍳</div>
+                                <h3>Kokeneet kokit</h3>
+                                <p>Ammattitaitoinen keittiötiimi</p>
+                            </div>
+                            <div class="feature">
+                                <div class="feature-icon">🏡</div>
+                                <h3>Kodikkas tunnelma</h3>
+                                <p>Lämmin ja viihtyisä ympäristö</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="about-image">
+                        <img src="assets/img/about.jpg" alt="Apricus ravintola sisältä">
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Cart Sidebar -->
+    <aside class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h2>Ostoskori</h2>
+            <button class="close-btn" id="closeCart">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
         </div>
-      </div>
-    </div>
-    <div class="footer-bottom">&copy; 2025 Apricus. Kaikki oikeudet pidätetään.</div>
-  </footer>
+        <div class="cart-content" id="cartItems">
+            <div class="empty-cart">
+                <div class="empty-cart-icon">🛒</div>
+                <p>Ostoskorisi on tyhjä</p>
+                <small>Lisää tuotteita ruokalistasta</small>
+            </div>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Yhteensä: <strong id="cartTotal">0,00 €</strong></span>
+            </div>
+            <button class="btn primary full-width" id="checkoutBtn" disabled>
+                Siirry kassalle
+            </button>
+        </div>
+    </aside>
 
-  <script type="module" src="js/main.js"></script>
+    <!-- Favorites Sidebar -->
+    <aside class="favorites-sidebar" id="favoritesSidebar">
+        <div class="favorites-header">
+            <h2>Suosikit</h2>
+            <button class="close-btn" id="closeFavorites">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+        <div class="favorites-content" id="favoritesList">
+            <div class="empty-favorites">
+                <div class="empty-favorites-icon">❤️</div>
+                <p>Ei suosikkeja vielä</p>
+                <small>Lisää suosikkeja klikkaamalla sydäntä</small>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Footer -->
+    <footer class="modern-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>Apricus</h3>
+                    <p>Ainutlaatuisia makuelämyksiä sydämessä kaupunkia</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link" title="Instagram">
+                            <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link" title="Facebook">
+                            <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Yhteystiedot</h3>
+                    <div class="contact-info">
+                        <p>📍 mellunmäki 22, Helsinki</p>
+                        <p>📞 <a href="tel:+358123456789">+358 4056478</a></p>
+                        <p>✉️ <a href="mailto:tk@gmail.com">tk@gmail.com</a></p>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Aukioloajat</h3>
+                    <div class="opening-hours">
+                        <p><strong>Ma-Pe:</strong> 10:00 - 22:00</p>
+                        <p><strong>La:</strong> 11:00 - 23:00</p>
+                        <p><strong>Su:</strong> 12:00 - 21:00</p>
+                    </div>
+                    <button class="btn secondary" id="directionsBtn">
+                        🗺️ Reittiohjeet
+                    </button>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Pikakäyttö</h3>
+                    <button class="btn admin-btn" onclick="quickAdminLogin()">
+                        ⚡ Admin-kirjautuminen
+                    </button>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Apricus. Kaikki oikeudet pidätetään.</p>
+                <p>Suunniteltu ja toteutettu ❤️:lla</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Overlay for mobile menu and modals -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Loading indicator -->
+    <div class="loading-indicator" id="loadingIndicator">
+        <div class="spinner large"></div>
+        <p>Ladataan...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/inert-polyfill.js"></script>
+    <script src="js/restaurant-api.js"></script>
+    <script src="js/app-state.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/components.js"></script>
+    <script type="module" src="js/cart.js"></script>
+    <script src="js/main.js"></script>
+
+    <!-- Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/js/sw.js')
+                .then(reg => console.log('SW registered', reg))
+                .catch(err => console.log('SW registration failed', err));
+        }
+
+        // Utility functions
+        function scrollToMenu() {
+            document.getElementById('menu').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
+
+        function scrollToAbout() {
+            document.getElementById('tietoa').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
+
+        // Quick admin login for testing
+        async function quickAdminLogin() {
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            loadingIndicator.style.display = 'flex';
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        email: 'admin@email.com', 
+                        password: 'admin123' 
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.token) {
+                    localStorage.setItem('jwt_token', data.token);
+                    if (typeof updateUserUI === 'function') {
+                        updateUserUI();
+                    }
+                    showNotification('Admin-kirjautuminen onnistui!', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showNotification('Kirjautuminen epäonnistui: ' + (data.error || 'Tuntematon virhe'), 'error');
+                }
+            } catch (error) {
+                console.error('Virhe admin-kirjautumisessa:', error);
+                showNotification('Yhteysvirhe: ' + error.message, 'error');
+            } finally {
+                loadingIndicator.style.display = 'none';
+            }
+        }
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()">×</button>
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Apricus - Sivusto latautunut!');
+            
+            // Mobile menu toggle
+            const mobileToggle = document.getElementById('mobileMenuToggle');
+            const navigation = document.querySelector('.main-navigation');
+            
+            if (mobileToggle && navigation) {
+                mobileToggle.addEventListener('click', () => {
+                    navigation.classList.toggle('active');
+                    mobileToggle.classList.toggle('active');
+                });
+            }
+        });
+    </script>
 </body>
 </html>
