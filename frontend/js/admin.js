@@ -356,12 +356,32 @@ class AdminPanel {
           <p>${category.description}</p>
         </div>
         <div class="category-actions">
-          <button class="btn secondary small" onclick="adminPanel.editCategory('${category.id}')">
+          <button class="btn secondary small" data-action="edit" data-category-id="${category.id}">
             Muokkaa
           </button>
         </div>
       </div>
     `).join('');
+    
+    // Add event delegation for category action buttons
+    this.setupCategoryEventListeners();
+  }
+  
+  setupCategoryEventListeners() {
+    const container = document.getElementById('categoriesGrid');
+    if (!container) return;
+    
+    container.addEventListener('click', (e) => {
+      const button = e.target.closest('button[data-action]');
+      if (!button) return;
+      
+      const action = button.dataset.action;
+      const categoryId = button.dataset.categoryId;
+      
+      if (action === 'edit') {
+        this.editCategory(categoryId);
+      }
+    });
   }
 
   async loadRecipes() {
@@ -386,7 +406,8 @@ class AdminPanel {
       return;
     }
 
-    tbody.innerHTML = recipes.map(recipe => `
+    tbody.innerHTML = recipes.map(recipe => {
+      return `
       <tr>
         <td>
           <img src="${recipe.image || '/assets/img/placeholder.jpg'}" alt="${recipe.name}" class="recipe-thumbnail">
@@ -406,16 +427,39 @@ class AdminPanel {
         </td>
         <td>
           <div class="action-buttons">
-            <button class="btn secondary small" onclick="adminPanel.editRecipe('${recipe.id}')">
+            <button class="btn secondary small" data-action="edit" data-recipe-id="${recipe.id}">
               Muokkaa
             </button>
-            <button class="btn danger small" onclick="adminPanel.deleteRecipe('${recipe.id}')">
+            <button class="btn danger small" data-action="delete" data-recipe-id="${recipe.id}">
               Poista
             </button>
           </div>
         </td>
       </tr>
-    `).join('');
+      `;
+    }).join('');
+    
+    // Add event delegation for recipe action buttons
+    this.setupRecipeEventListeners();
+  }
+  
+  setupRecipeEventListeners() {
+    const tbody = document.getElementById('menuTableBody');
+    if (!tbody) return;
+    
+    tbody.addEventListener('click', (e) => {
+      const button = e.target.closest('button[data-action]');
+      if (!button) return;
+      
+      const action = button.dataset.action;
+      const recipeId = button.dataset.recipeId;
+      
+      if (action === 'edit') {
+        this.editRecipe(recipeId);
+      } else if (action === 'delete') {
+        this.deleteRecipe(recipeId);
+      }
+    });
   }
 
   filterRecipes() {
@@ -495,7 +539,7 @@ class AdminPanel {
         </div>
         
         <div class="order-status">
-          <select class="status-select" onchange="adminPanel.updateOrderStatus('${order.id}', this.value)">
+          <select class="status-select" data-order-id="${order.id}">
             <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>Odottaa</option>
             <option value="confirmed" ${order.status === 'confirmed' ? 'selected' : ''}>Vahvistettu</option>
             <option value="preparing" ${order.status === 'preparing' ? 'selected' : ''}>Valmistetaan</option>
@@ -508,6 +552,22 @@ class AdminPanel {
         ${order.notes ? `<div class="order-notes"><strong>Huomautukset:</strong> ${order.notes}</div>` : ''}
       </div>
     `).join('');
+    
+    // Add event delegation for order status selects
+    this.setupOrderEventListeners();
+  }
+  
+  setupOrderEventListeners() {
+    const container = document.getElementById('ordersGrid');
+    if (!container) return;
+    
+    container.addEventListener('change', (e) => {
+      if (e.target.classList.contains('status-select')) {
+        const orderId = e.target.dataset.orderId;
+        const newStatus = e.target.value;
+        this.updateOrderStatus(orderId, newStatus);
+      }
+    });
   }
 
   filterOrders() {
@@ -678,12 +738,32 @@ class AdminPanel {
         <td>${new Date(customer.createdAt).toLocaleDateString('fi-FI')}</td>
         <td>0</td>
         <td>
-          <button class="btn secondary small" onclick="adminPanel.viewCustomerDetails('${customer.id}')">
+          <button class="btn secondary small" data-action="view" data-customer-id="${customer.id}">
             Näytä tiedot
           </button>
         </td>
       </tr>
     `).join('');
+    
+    // Add event delegation for customer action buttons
+    this.setupCustomerEventListeners();
+  }
+  
+  setupCustomerEventListeners() {
+    const tbody = document.getElementById('customersTableBody');
+    if (!tbody) return;
+    
+    tbody.addEventListener('click', (e) => {
+      const button = e.target.closest('button[data-action]');
+      if (!button) return;
+      
+      const action = button.dataset.action;
+      const customerId = button.dataset.customerId;
+      
+      if (action === 'view') {
+        this.viewCustomerDetails(customerId);
+      }
+    });
   }
 
   closeModals() {

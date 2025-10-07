@@ -100,9 +100,18 @@ function initializeModernApp() {
         
         if (searchInput) {
             searchInput.addEventListener('input', debounce(handleSearch, 300));
+            searchInput.addEventListener('input', debounce(showSearchSuggestions, 200));
             searchInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     handleSearch();
+                    hideSearchSuggestions();
+                }
+            });
+            
+            // Hide suggestions when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.search-container')) {
+                    hideSearchSuggestions();
                 }
             });
         }
@@ -130,26 +139,180 @@ function initializeModernApp() {
         });
     }
 
-    // Search functionality
+    // Enhanced Search functionality
     function handleSearch() {
         const query = document.getElementById('searchInput').value.toLowerCase().trim();
-        console.log('🔍 Haku:', query);
+        console.log('🔍 Parannettu haku:', query);
         
         if (!query) {
             appState.filteredMenu = appState.menu;
         } else {
-            appState.filteredMenu = appState.menu.filter(item => 
-                item.name.toLowerCase().includes(query) ||
-                item.description.toLowerCase().includes(query) ||
-                item.ingredients.some(ing => ing.toLowerCase().includes(query))
-            );
+            appState.filteredMenu = appState.menu.filter(item => {
+                // Haku nimessä (suomi ja englanti)
+                const nameMatch = item.name.toLowerCase().includes(query) ||
+                                (item.nameEn && item.nameEn.toLowerCase().includes(query));
+                
+                // Haku kuvauksessa
+                const descMatch = item.description.toLowerCase().includes(query);
+                
+                // Haku ainesosissa
+                const ingredientMatch = item.ingredients && 
+                                      item.ingredients.some(ing => ing.toLowerCase().includes(query));
+                
+                // Haku kategoriassa
+                const categoryMatch = item.category && item.category.toLowerCase().includes(query);
+                
+                // Sumea haku (fuzzy search) nimille
+                const fuzzyNameMatch = fuzzySearch(query, item.name.toLowerCase()) ||
+                                     (item.nameEn && fuzzySearch(query, item.nameEn.toLowerCase()));
+                
+                return nameMatch || descMatch || ingredientMatch || categoryMatch || fuzzyNameMatch;
+            });
         }
         
         renderMenu();
+        showSearchResults(query);
         
         if (appState.filteredMenu.length === 0 && query) {
             showNotification(`Ei tuloksia haulle "${query}"`, 'info');
         }
+    }
+
+    // Fuzzy search function for better search results
+    function fuzzySearch(query, text, threshold = 0.6) {
+        if (query.length > text.length) return false;
+        
+        let score = 0;
+        let queryIndex = 0;
+        
+        for (let i = 0; i < text.length && queryIndex < query.length; i++) {
+            if (text[i] === query[queryIndex]) {
+                score++;
+                queryIndex++;
+            }
+        }
+        
+        return (score / query.length) >= threshold;
+    }
+
+    // Show search results summary
+    function showSearchResults(query) {
+        const searchResultsContainer = document.getElementById('searchResults');
+        
+        if (!searchResultsContainer) {
+            // Create search results container if it doesn't exist
+            const container = document.createElement('div');
+            container.id = 'searchResults';
+            container.className = 'search-results-summary';
+            
+            const menuSection = document.getElementById('menu');
+            if (menuSection) {
+                menuSection.insertBefore(container, menuSection.firstChild);
+            }
+        }
+        
+        const resultsContainer = document.getElementById('searchResults');
+        
+        if (query && resultsContainer) {
+            const count = appState.filteredMenu.length;
+            resultsContainer.innerHTML = `
+                <div class="search-summary">
+                    <h3>Hakutulokset: "${query}"</h3>
+                    <p>Löydetty ${count} ${count === 1 ? 'tulos' : 'tulosta'}</p>
+                    <button class="clear-search-btn" onclick="clearSearch()">Tyhjennä haku</button>
+                </div>
+            `;
+            resultsContainer.style.display = 'block';
+        } else if (resultsContainer) {
+            resultsContainer.style.display = 'none';
+        }
+    }
+
+    // Clear search function (make it global)
+    window.clearSearch = function() {
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.value = '';
+        }
+        appState.filteredMenu = appState.menu;
+        renderMenu();
+        const resultsContainer = document.getElementById('searchResults');
+        if (resultsContainer) {
+            resultsContainer.style.display = 'none';
+        }
+    };
+
+    // Search suggestions functionality
+    function showSearchSuggestions() {
+        const query = document.getElementById('searchInput').value.toLowerCase().trim();
+        
+        if (query.length < 2) {
+            hideSearchSuggestions();
+            return;
+        }
+        
+        const suggestions = appState.menu
+            .filter(item => {
+                return item.name.toLowerCase().includes(query) ||
+                       (item.nameEn && item.nameEn.toLowerCase().includes(query)) ||
+                       item.ingredients.some(ing => ing.toLowerCase().includes(query));
+            })
+            .slice(0, 5); // Show only top 5 suggestions
+        
+        displaySuggestions(suggestions);
+    }
+
+    function displaySuggestions(suggestions) {
+        let suggestionsContainer = document.querySelector('.search-suggestions');
+        
+        if (!suggestionsContainer) {
+            suggestionsContainer = document.createElement('div');
+            suggestionsContainer.className = 'search-suggestions';
+            document.querySelector('.search-container').appendChild(suggestionsContainer);
+        }
+        
+        if (suggestions.length === 0) {
+            hideSearchSuggestions();
+            return;
+        }
+        
+        suggestionsContainer.innerHTML = suggestions.map(item => `
+            <div class="search-suggestion" onclick="selectSuggestion('${item.name}')">
+                <div class="suggestion-name">${item.name}</div>
+                <div class="suggestion-category">${getCategoryDisplayName(item.category)}</div>
+            </div>
+        `).join('');
+        
+        suggestionsContainer.style.display = 'block';
+    }
+
+    function hideSearchSuggestions() {
+        const container = document.querySelector('.search-suggestions');
+        if (container) {
+            container.style.display = 'none';
+        }
+    }
+
+    // Select suggestion (make it global)
+    window.selectSuggestion = function(itemName) {
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.value = itemName;
+        }
+        handleSearch();
+        hideSearchSuggestions();
+    };
+
+    // Get category display name
+    function getCategoryDisplayName(category) {
+        const categoryNames = {
+            'appetizers': 'Alkuruoat',
+            'main-dishes': 'Pääruoat', 
+            'desserts': 'Jälkiruoat',
+            'beverages': 'Juomat',
+            'hot-beverages': 'Kuumat juomat'
+        };
+        return categoryNames[category] || category;
     }
 
     // Filters functionality

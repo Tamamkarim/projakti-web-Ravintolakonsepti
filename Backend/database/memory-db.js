@@ -54,6 +54,14 @@ class InMemoryDatabase {
       description: 'Virkistäviä ja monipuolisia juomia',
       image: '/assets/img/beverages.jpg'
     });
+
+    this.categories.set('hot-beverages', {
+      id: 'hot-beverages',
+      name: 'Kuumat juomat',
+      nameEn: 'Hot Beverages',
+      description: 'Perinteisiä ja herkullisia kuumia juomia',
+      image: '/assets/img/hot-beverages.jpg'
+    });
     
     // Näytereseptejä
     this.recipes.set('recipe-001', {
@@ -98,6 +106,81 @@ class InMemoryDatabase {
       preparationTime: 20,
       isAvailable: true,
       rating: 4.3,
+      createdAt: new Date().toISOString()
+    });
+
+    this.recipes.set('recipe-004', {
+      id: 'recipe-004',
+      name: 'Hummus tahinin kanssa',
+      nameEn: 'Hummus with Tahini',
+      description: 'Kermainen tuore hummus tahinin, oliiviöljyn ja pähkinöiden kanssa',
+      price: 18.00,
+      category: 'appetizers',
+      image: '/assets/img/hummus.jpg',
+      ingredients: ['Keitetyt kikherneet', 'Tahini', 'Valkosipuli', 'Sitruunamehu', 'Oliiviöljy', 'Pähkinät', 'Paprika', 'Persilja'],
+      preparationTime: 15,
+      isAvailable: true,
+      rating: 4.6,
+      createdAt: new Date().toISOString()
+    });
+
+    this.recipes.set('recipe-005', {
+      id: 'recipe-005',
+      name: 'Minttutee',
+      nameEn: 'Mint Black Tea',
+      description: 'Perinteinen musta tee tuoreen mintun ja sokerin kanssa',
+      price: 8.00,
+      category: 'hot-beverages',
+      image: '/assets/img/mint-tea.jpg',
+      ingredients: ['Musta tee', 'Tuore minttu', 'Sokeri', 'Kiehuvaa vettä'],
+      preparationTime: 5,
+      isAvailable: true,
+      rating: 4.4,
+      createdAt: new Date().toISOString()
+    });
+
+    this.recipes.set('recipe-006', {
+      id: 'recipe-006',
+      name: 'Arabialainen kahvi',
+      nameEn: 'Arabic Coffee',
+      description: 'Aito arabialainen kahvi kardemumman ja sahramilla',
+      price: 12.00,
+      category: 'hot-beverages',
+      image: '/assets/img/arabic-coffee.jpg',
+      ingredients: ['Arabialainen kahvi', 'Kardemumma', 'Sahrami', 'Vesi'],
+      preparationTime: 10,
+      isAvailable: true,
+      rating: 4.7,
+      createdAt: new Date().toISOString()
+    });
+
+    this.recipes.set('recipe-007', {
+      id: 'recipe-007',
+      name: 'Linssisoppa',
+      nameEn: 'Lentil Soup',
+      description: 'Perinteinen linssisoppa vihannesten ja arabialaisien mausteiden kanssa',
+      price: 22.00,
+      category: 'appetizers',
+      image: '/assets/img/lentil-soup.jpg',
+      ingredients: ['Punaiset linssit', 'Porkkana', 'Sipuli', 'Valkosipuli', 'Juustokumina', 'Kurkuma', 'Sitruunamehu'],
+      preparationTime: 25,
+      isAvailable: true,
+      rating: 4.4,
+      createdAt: new Date().toISOString()
+    });
+
+    this.recipes.set('recipe-008', {
+      id: 'recipe-008',
+      name: 'Hibiskustee',
+      nameEn: 'Hibiscus Tea',
+      description: 'Virkistävä hibiskusjuoma kylmänä tai kuumana mintun kanssa',
+      price: 10.00,
+      category: 'hot-beverages',
+      image: '/assets/img/hibiscus-tea.jpg',
+      ingredients: ['Kuivattu hibiskus', 'Minttu', 'Sokeri', 'Vesi'],
+      preparationTime: 8,
+      isAvailable: true,
+      rating: 4.2,
       createdAt: new Date().toISOString()
     });
   }

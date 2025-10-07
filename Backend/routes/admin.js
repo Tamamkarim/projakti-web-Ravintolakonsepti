@@ -44,9 +44,9 @@ let orders = [
 
 let settings = {
     name: 'Apricus Kahvila & Ravintola',
-    phone: '+358 12 345 6789',
-    email: 'info@apricus.fi',
-    address: 'Makuja-katu 12, Kaupunki'
+    phone: '+358 406745768',
+    email: 'TK@apricus.fi',
+    address: 'mellunkyläntie 6, 00920 Helsinki',
 };
 
 let nextDishId = 4;
