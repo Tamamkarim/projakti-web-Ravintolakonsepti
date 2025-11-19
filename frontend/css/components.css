@@ -146,7 +146,7 @@
 }
 
 /* ===================================
-   CART ITEM COMPONENTS
+   عناصر السلة - تصميم محسن ومتطور
    =================================== */
 
 .cart-item,
@@ -154,27 +154,59 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    padding: 1rem;
-    border: 1px solid #e8e8e8;
-    border-radius: 12px;
+    padding: 1.25rem;
+    border: 1px solid rgba(192, 57, 43, 0.1);
+    border-radius: 16px;
     margin-bottom: 1rem;
-    background: white;
-    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.cart-item::before,
+.favorite-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(192, 57, 43, 0.05), 
+        transparent);
+    transition: left 0.5s ease;
+}
+
+.cart-item:hover::before,
+.favorite-item:hover::before {
+    left: 100%;
 }
 
 .cart-item:hover,
 .favorite-item:hover {
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(192, 57, 43, 0.15);
+    transform: translateY(-3px);
+    border-color: rgba(192, 57, 43, 0.3);
 }
 
 .cart-item-image,
 .favorite-item-image {
-    width: 60px;
-    height: 60px;
+    width: 70px;
+    height: 70px;
     object-fit: cover;
-    border-radius: 8px;
+    border-radius: 12px;
     flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 2px solid #fff;
+    transition: transform 0.3s ease;
+}
+
+.cart-item:hover .cart-item-image,
+.favorite-item:hover .favorite-item-image {
+    transform: scale(1.05) rotate(1deg);
 }
 
 .cart-item-details,
@@ -185,89 +217,157 @@
 
 .cart-item-details h4,
 .favorite-item-details h4 {
-    margin: 0 0 0.25rem 0;
-    font-size: 1rem;
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
     color: #2c3e50;
+    font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .cart-item-price,
 .favorite-item-price {
     margin: 0;
-    font-weight: 600;
+    font-weight: 700;
     color: #c0392b;
-    font-size: 0.9rem;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.cart-item-price::before {
+    content: '💰';
+    font-size: 0.8rem;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
 }
 
 .cart-item-controls {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    background: #f8f9fa;
-    border-radius: 20px;
-    padding: 0.25rem;
+    gap: 0.75rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 25px;
+    padding: 0.5rem;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .qty-btn {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border: none;
-    background: white;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
     color: #c0392b;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-weight: 600;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-weight: 700;
+    font-size: 1.1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+    border: 2px solid rgba(192, 57, 43, 0.2);
 }
 
 .qty-btn:hover {
-    background: #c0392b;
+    background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
     color: white;
     transform: scale(1.1);
+    box-shadow: 0 5px 15px rgba(192, 57, 43, 0.4);
+}
+
+.qty-btn:active {
+    transform: scale(0.95);
 }
 
 .quantity {
+    font-weight: 700;
+    color: #2c3e50;
+    font-size: 1.1rem;
     min-width: 30px;
     text-align: center;
-    font-weight: 600;
-    color: #2c3e50;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 0.25rem 0.5rem;
+    border-radius: 8px;
+    backdrop-filter: blur(5px);
 }
 
 .remove-btn {
-    background: none;
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
     border: none;
-    color: #e74c3c;
-    cursor: pointer;
+    color: white;
     padding: 0.5rem;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    font-size: 1.2rem;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 3px 10px rgba(231, 76, 60, 0.3);
+    margin-left: 0.5rem;
 }
 
 .remove-btn:hover {
-    background: #ffe6e6;
-    transform: scale(1.1);
+    background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+    transform: scale(1.1) rotate(90deg);
+    box-shadow: 0 5px 15px rgba(231, 76, 60, 0.5);
+}
+
+.remove-btn:active {
+    transform: scale(0.9) rotate(90deg);
 }
 
 .favorite-item-actions {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.75rem;
+    margin-left: 0.5rem;
 }
 
 .btn.small {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.8rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    border-radius: 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn.small::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s;
+}
+
+.btn.small:hover::before {
+    width: 100%;
+    height: 100%;
+}
+
+.btn.small:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
 /* ===================================
-   EMPTY STATES
+   حالات فارغة محسنة مع تأثيرات بصرية
    =================================== */
 
 .empty-cart,
@@ -277,16 +377,50 @@
     text-align: center;
     padding: 3rem 2rem;
     color: #6c757d;
+    background: linear-gradient(135deg, #f8f9fc 0%, #ffffff 100%);
+    border-radius: 16px;
+    margin: 1rem 0;
+    border: 1px solid rgba(108, 117, 125, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.empty-cart::before,
+.empty-favorites::before,
+.empty-menu::before,
+.error-state::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, 
+        rgba(192, 57, 43, 0.02) 0%, 
+        transparent 50%);
+    animation: rotate 20s linear infinite;
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 .empty-cart-icon,
 .empty-favorites-icon,
 .empty-icon,
 .error-icon {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-    opacity: 0.6;
+    font-size: 5rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.7;
     display: block;
+    animation: float 3s ease-in-out infinite;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
 }
 
 .empty-cart p,
@@ -294,8 +428,10 @@
 .empty-menu h3,
 .error-state h3 {
     margin: 0 0 0.5rem 0;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     color: #2c3e50;
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .empty-cart small,

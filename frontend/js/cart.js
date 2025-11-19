@@ -9,12 +9,20 @@ export function addToCart(dish, qty=1){
   if(item) item.qty += qty;
   else cart.push({ id:dish.id, name: dish.name_fi||dish.name_en||'Ruoka', price: dish.price||0, qty, image: dish.image_url||''});
   saveCart(cart);
+  // تحديث واجهة السلة بعد الإضافة
+  if (typeof window.updateCartUI === 'function') {
+    window.updateCartUI();
+  }
   return cart;
 }
 export function removeFromCart(dishId){
   let cart = loadCart();
   cart = cart.filter(i=>i.id!==dishId);
   saveCart(cart);
+  // تحديث واجهة السلة بعد الحذف
+  if (typeof window.updateCartUI === 'function') {
+    window.updateCartUI();
+  }
   return cart;
 }
 export function updateQty(dishId, qty){
@@ -22,9 +30,20 @@ export function updateQty(dishId, qty){
   const it = cart.find(i=>i.id===dishId);
   if(it) it.qty = Math.max(1, qty);
   saveCart(cart);
+  // تحديث واجهة السلة بعد تغيير الكمية
+  if (typeof window.updateCartUI === 'function') {
+    window.updateCartUI();
+  }
   return cart;
 }
-export function clearCart(){ localStorage.removeItem(CART_KEY); return []; }
+export function clearCart(){ 
+  localStorage.removeItem(CART_KEY); 
+  // تحديث واجهة السلة بعد التفريغ
+  if (typeof window.updateCartUI === 'function') {
+    window.updateCartUI();
+  }
+  return []; 
+}
 export function cartTotal(cart){
   return (cart||loadCart()).reduce((s,i)=>s + (i.price||0) * (i.qty||1), 0);
 }

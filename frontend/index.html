@@ -49,7 +49,7 @@
                         <circle cx="20" cy="21" r="1"/>
                         <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
                     </svg>
-                    <span class="cart-count" id="cartCount">0</span>
+                    <span class="cart-count" id="cartCount"></span>
                 </button>
 
                 <!-- Favorites Button -->
@@ -111,7 +111,7 @@
     </header>
 
     <!-- Hero Section -->
-    <section class="hero-section">
+    <section class="hero-section" id="etusivu">
         <div class="hero-background">
             <img src="assets/img/Asil.jpg" alt="Apricus ravintola" class="hero-image">
             <div class="hero-overlay"></div>
@@ -196,9 +196,10 @@
                 <div class="menu-categories">
                     <button class="category-btn active" data-category="all">Kaikki</button>
                     <button class="category-btn" data-category="appetizers">Alkuruoat</button>
-                    <button class="category-btn" data-category="mains">Pääruoat</button>
+                    <button class="category-btn" data-category="main-dishes">Pääruoat</button>
                     <button class="category-btn" data-category="desserts">Jälkiruoat</button>
-                    <button class="category-btn" data-category="drinks">Juomat</button>
+                    <button class="category-btn" data-category="beverages">Kylmät juomat</button>
+                    <button class="category-btn" data-category="hot-beverages">Kuumat juomat</button>
                 </div>
                 
                 <div class="menu-grid" id="menuGrid">
@@ -293,6 +294,37 @@
         </div>
     </aside>
 
+    <!-- Contact Section -->
+    <section class="contact-section" id="yhteystiedot">
+        <div class="container">
+            <h2>Yhteystiedot</h2>
+            <div class="contact-grid">
+                <div class="contact-info-card">
+                    <div class="icon">📍</div>
+                    <h3>Osoite</h3>
+                    <p>mellunmäki 22, Helsinki</p>
+                </div>
+                <div class="contact-info-card">
+                    <div class="icon">📞</div>
+                    <h3>Puhelin</h3>
+                    <p><a href="tel:+358123456789">+358 4056478</a></p>
+                </div>
+                <div class="contact-info-card">
+                    <div class="icon">✉️</div>
+                    <h3>Sähköposti</h3>
+                    <p><a href="mailto:tk@gmail.com">tk@gmail.com</a></p>
+                </div>
+                <div class="contact-info-card">
+                    <div class="icon">🕒</div>
+                    <h3>Aukioloajat</h3>
+                    <p>Ma-Pe: 10:00 - 22:00</p>
+                    <p>La: 11:00 - 23:00</p>
+                    <p>Su: 12:00 - 21:00</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer class="modern-footer">
         <div class="container">
@@ -360,6 +392,29 @@
     </div>
 
     <!-- Scripts -->
+    <script>
+        // Global error handler for debugging
+        window.addEventListener('error', function(e) {
+            console.error('JavaScript Error:', {
+                message: e.message,
+                filename: e.filename,
+                lineno: e.lineno,
+                colno: e.colno,
+                stack: e.error?.stack
+            });
+        });
+        
+        // دالة لتنظيف السلة بالكامل (للاختبار والتطوير)
+        window.resetCart = function() {
+            localStorage.removeItem('rm_cart_v1');
+            console.log('✅ تم تنظيف السلة بالكامل');
+            if (typeof window.updateCartUI === 'function') {
+                window.updateCartUI();
+            }
+            location.reload();
+        };
+        console.log('💡 لتنظيف السلة، اكتب في Console: resetCart()');
+    </script>
     <script src="js/inert-polyfill.js"></script>
     <script src="js/restaurant-api.js"></script>
     <script src="js/app-state.js"></script>
@@ -371,6 +426,14 @@
     <!-- Service Worker -->
     <script>
         if ('serviceWorker' in navigator) {
+            // Unregister existing service worker to clear cache
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for(let registration of registrations) {
+                    registration.unregister();
+                }
+            });
+            
+            // Register new service worker
             navigator.serviceWorker.register('/js/sw.js')
                 .then(reg => console.log('SW registered', reg))
                 .catch(err => console.log('SW registration failed', err));

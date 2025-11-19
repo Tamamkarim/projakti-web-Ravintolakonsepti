@@ -62,8 +62,27 @@ function initializeModernApp() {
             lactoseFree: false,
             allergens: [],
             maxPrice: 50
+        },
+        // Add cart methods that components expect
+        addToCart: function(recipe) {
+            if (typeof window.addToCart === 'function') {
+                window.addToCart(recipe.id || recipe, 1);
+            }
+        },
+        updateCartQuantity: function(itemId, quantity) {
+            if (typeof window.updateQty === 'function') {
+                window.updateQty(itemId, quantity);
+            }
+        },
+        removeFromCart: function(itemId) {
+            if (typeof window.removeFromCart === 'function') {
+                window.removeFromCart(itemId);
+            }
         }
     };
+
+    // Make appState globally available for components
+    window.appState = appState;
 
     // Initialize UI components
     initializeHeader();
@@ -73,9 +92,14 @@ function initializeModernApp() {
     initializeFavorites();
     initializeAuth();
     
+    // جعل updateCartUI متاحة عالمياً قبل أي شيء
+    window.updateCartUI = updateCartUI;
+    
+    // تحديث واجهة السلة أولاً لإخفاء/إظهار العداد بشكل صحيح
+    updateCartUI();
+    
     // Load initial data
     loadMenuData();
-    updateCartUI();
     checkAuthStatus();
 
     // Header functionality
@@ -551,7 +575,7 @@ function initializeModernApp() {
                             <div class="menu-item-price">${item.price.toFixed(2)} €</div>
                         </div>
                         <button class="favorite-btn ${appState.favorites.includes(item.id) ? 'active' : ''}" 
-                                onclick="toggleFavorite(${item.id})" 
+                                onclick="toggleFavorite('${item.id}')" 
                                 title="Lisää suosikkeihin">
                             ❤️
                         </button>
@@ -567,10 +591,10 @@ function initializeModernApp() {
                     </div>
                     
                     <div class="menu-item-actions">
-                        <button class="btn secondary" onclick="showItemDetails(${item.id})">
+                        <button class="btn secondary" onclick="showItemDetails('${item.id}')">
                             Näytä tiedot
                         </button>
-                        <button class="btn primary" onclick="addToCartFromMenu(${item.id})">
+                        <button class="btn primary" onclick="addToCartFromMenu('${item.id}')">
                             Lisää koriin
                         </button>
                     </div>
@@ -604,11 +628,13 @@ function initializeModernApp() {
             checkoutBtn.addEventListener('click', handleCheckout);
         }
         
-        // Close cart when clicking overlay
-        document.getElementById('overlay').addEventListener('click', closeCart);
+        // إزالة إغلاق السلة عند الضغط على overlay
+        // السلة تُغلق فقط بزر X
+        // document.getElementById('overlay').addEventListener('click', closeCart);
     }
 
     function closeCart() {
+        console.log('🚪 إغلاق السلة');
         document.getElementById('cartSidebar').classList.remove('active');
         document.getElementById('overlay').classList.remove('active');
     }
@@ -619,13 +645,20 @@ function initializeModernApp() {
         const cartTotal = document.getElementById('cartTotal');
         const checkoutBtn = document.getElementById('checkoutBtn');
         
-        const cart = loadCart();
-        const totalItems = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
+        const cart = loadCart(); // هذا يعطي مصفوفة من cart.js
+        const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
         const total = calculateCartTotal();
         
+        console.log('🛒 تحديث واجهة السلة - عدد العناصر:', totalItems, 'السلة:', cart);
+        
         if (cartCount) {
-            cartCount.textContent = totalItems;
-            cartCount.style.display = totalItems > 0 ? 'block' : 'none';
+            if (totalItems > 0) {
+                cartCount.textContent = totalItems;
+                cartCount.style.display = 'block';
+            } else {
+                cartCount.textContent = '';
+                cartCount.style.display = 'none';
+            }
         }
         
         if (cartTotal) {
@@ -646,37 +679,38 @@ function initializeModernApp() {
                     </div>
                 `;
             } else {
-                cartItems.innerHTML = Object.entries(cart).map(([itemId, quantity]) => {
-                    const item = appState.menu.find(m => m.id == itemId);
+                cartItems.innerHTML = cart.map(cartItem => {
+                    const item = appState.menu.find(m => m.id == cartItem.id);
                     if (!item) return '';
                     
                     return `
                         <div class="cart-item">
-                            <img src="${item.image || 'assets/img/placeholder.jpg'}" 
-                                 alt="${escapeHtml(item.name)}" 
+                            <img src="${cartItem.image || item.image || 'assets/img/placeholder.jpg'}" 
+                                 alt="${escapeHtml(cartItem.name || item.name)}" 
                                  class="cart-item-image">
                             <div class="cart-item-details">
-                                <h4>${escapeHtml(item.name)}</h4>
-                                <p class="cart-item-price">${item.price.toFixed(2)} €</p>
+                                <h4>${escapeHtml(cartItem.name || item.name)}</h4>
+                                <p class="cart-item-price">${(cartItem.price || item.price || 0).toFixed(2)} €</p>
                             </div>
                             <div class="cart-item-controls">
-                                <button onclick="updateCartQuantity(${itemId}, ${quantity - 1})" class="qty-btn">-</button>
-                                <span class="quantity">${quantity}</span>
-                                <button onclick="updateCartQuantity(${itemId}, ${quantity + 1})" class="qty-btn">+</button>
+                                <button onclick="updateCartQuantity('${cartItem.id}', ${cartItem.qty - 1})" class="qty-btn">-</button>
+                                <span class="quantity">${cartItem.qty}</span>
+                                <button onclick="updateCartQuantity('${cartItem.id}', ${cartItem.qty + 1})" class="qty-btn">+</button>
                             </div>
-                            <button onclick="removeFromCartCompletely(${itemId})" class="remove-btn" title="Poista korista">🗑️</button>
+                            <button onclick="removeFromCartCompletely('${cartItem.id}')" class="remove-btn" title="Poista korista">
+                                ×
+                            </button>
                         </div>
                     `;
-                }).filter(html => html).join('');
+                }).join('');
             }
         }
     }
 
     function calculateCartTotal() {
-        const cart = loadCart();
-        return Object.entries(cart).reduce((total, [itemId, quantity]) => {
-            const item = appState.menu.find(m => m.id == itemId);
-            return total + (item ? item.price * quantity : 0);
+        const cart = loadCart(); // مصفوفة من العناصر
+        return cart.reduce((total, cartItem) => {
+            return total + (cartItem.price || 0) * (cartItem.qty || 1);
         }, 0);
     }
 
@@ -687,10 +721,10 @@ function initializeModernApp() {
             return;
         }
         
-        const cart = loadCart();
-        const orderItems = Object.entries(cart).map(([itemId, quantity]) => ({
-            id: parseInt(itemId),
-            quantity
+        const cart = loadCart(); // مصفوفة من العناصر
+        const orderItems = cart.map(cartItem => ({
+            id: parseInt(cartItem.id),
+            quantity: cartItem.qty
         }));
         
         console.log('💳 Käsitellään tilaus:', orderItems);
@@ -702,8 +736,7 @@ function initializeModernApp() {
             console.log('✅ Tilaus lähetetty:', response);
             
             clearCart();
-            updateCartUI();
-            closeCart();
+            // لا نغلق السلة هنا، تبقى مفتوحة
             
             showNotification('Tilaus lähetetty onnistuneesti! Kiitos tilauksestasi.', 'success');
             
@@ -766,8 +799,8 @@ function initializeModernApp() {
                             <p class="favorite-item-price">${item.price.toFixed(2)} €</p>
                         </div>
                         <div class="favorite-item-actions">
-                            <button onclick="addToCartFromMenu(${itemId})" class="btn primary small">Lisää koriin</button>
-                            <button onclick="toggleFavorite(${itemId})" class="btn secondary small">Poista</button>
+                            <button onclick="addToCartFromMenu('${itemId}')" class="btn primary small">Lisää koriin</button>
+                            <button onclick="toggleFavorite('${itemId}')" class="btn secondary small">Poista</button>
                         </div>
                     </div>
                 `;
@@ -950,12 +983,25 @@ function initializeModernApp() {
     };
 
     window.addToCartFromMenu = function(itemId) {
-        addToCart(itemId, 1);
-        updateCartUI();
-        
         const item = appState.menu.find(m => m.id == itemId);
         if (item) {
+            console.log('🛒 إضافة منتج إلى السلة:', item.name);
+            // استخدام دالة addToCart من cart.js التي تتطلب كائن العنصر
+            addToCart(item, 1);
+            // فتح السلة دائماً عند إضافة منتج (حتى لو كانت مفتوحة)
+            const cartSidebar = document.getElementById('cartSidebar');
+            const overlay = document.getElementById('overlay');
+            if (cartSidebar) {
+                cartSidebar.classList.add('active');
+                console.log('✅ السلة مفتوحة الآن');
+            }
+            if (overlay) {
+                overlay.classList.add('active');
+            }
             showNotification(`${item.name} lisätty koriin`, 'success');
+        } else {
+            console.error('لم يتم العثور على العنصر بالمعرف:', itemId);
+            showNotification('خطأ في إضافة العنصر', 'error');
         }
     };
 
@@ -965,14 +1011,14 @@ function initializeModernApp() {
         } else {
             updateQty(itemId, newQuantity);
         }
-        updateCartUI();
+        // لا حاجة لاستدعاء updateCartUI هنا لأنه يتم استدعاؤه تلقائياً في cart.js
     };
 
     window.removeFromCartCompletely = function(itemId) {
-        removeFromCart(itemId);
-        updateCartUI();
-        
         const item = appState.menu.find(m => m.id == itemId);
+        removeFromCart(itemId);
+        // لا حاجة لاستدعاء updateCartUI هنا لأنه يتم استدعاؤه تلقائياً في cart.js
+        
         if (item) {
             showNotification(`${item.name} poistettu korista`, 'info');
         }
@@ -1018,7 +1064,7 @@ function initializeModernApp() {
                 </div>
                 <div class="modal-footer">
                     <button class="btn secondary" onclick="this.closest('.item-detail-modal').remove()">Sulje</button>
-                    <button class="btn primary" onclick="addToCartFromMenu(${itemId}); this.closest('.item-detail-modal').remove();">Lisää koriin</button>
+                    <button class="btn primary" onclick="addToCartFromMenu('${itemId}'); this.closest('.item-detail-modal').remove();">Lisää koriin</button>
                 </div>
             </div>
         `;

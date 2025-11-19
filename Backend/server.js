@@ -54,6 +54,21 @@ app.use('/api/admin', require('./routes/admin-api'));
 app.use('/api/menu', require('./routes/menu'));
 app.use('/api/recipes', require('./routes/recipe'));
 
+// API base route - return basic info instead of falling through to HTML
+app.get('/api', (req, res) => {
+    res.json({
+        success: true,
+        message: 'Apricus Restaurant API',
+        version: '1.0.0',
+        endpoints: [
+            '/api/auth',
+            '/api/admin',
+            '/api/menu',
+            '/api/recipes'
+        ]
+    });
+});
+
 // JWT middleware (uses shared JWT_SECRET)
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('./routes/shared');

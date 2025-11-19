@@ -11,7 +11,7 @@ self.addEventListener('fetch', event => {
   // You can add caching logic here if needed
 });const CACHE = 'rm-cache-v1';
 const ASSETS = [
-  '../index.html', '../css/styles.css', 'main.js', 'api.js', 'cart.js', '../assets/img/placeholder.jpg', '../manifest.json'
+  '../index.html', '../css/styles.css', 'main.js', 'restaurant-api.js', 'cart.js', '../assets/img/placeholder.jpg', '../manifest.json'
 ];
 
 self.addEventListener('install', e=>{

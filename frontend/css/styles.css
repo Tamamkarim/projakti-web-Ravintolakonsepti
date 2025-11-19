@@ -156,6 +156,7 @@ body {
     border-radius: 10px;
     min-width: 18px;
     text-align: center;
+    display: none; /* مخفي بشكل افتراضي */
 }
 
 .user-menu {
@@ -740,22 +741,23 @@ section h2 {
 }
 
 /* ===================================
-   SIDEBARS
+   SIDEBARS - تصميم محسن للسلة
    =================================== */
 
 .cart-sidebar,
 .favorites-sidebar {
     position: fixed;
     top: 0;
-    right: -400px;
-    width: 400px;
+    right: -420px;
+    width: 420px;
     height: 100vh;
-    background: white;
-    box-shadow: -5px 0 20px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fc 100%);
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.15);
     z-index: 1002;
-    transition: right 0.3s ease;
+    transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     display: flex;
     flex-direction: column;
+    border-left: 3px solid #c0392b;
 }
 
 .cart-sidebar.active,
@@ -768,30 +770,63 @@ section h2 {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.5rem;
-    border-bottom: 1px solid #e8e8e8;
+    padding: 2rem 1.5rem 1.5rem;
+    background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.cart-header::before,
+.favorites-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20"><defs><linearGradient id="a" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="%23ffffff" stop-opacity="0.1"/><stop offset="1" stop-color="%23ffffff" stop-opacity="0"/></linearGradient></defs><polygon fill="url(%23a)" points="0,20 100,0 100,20"/></svg>') repeat-x;
+    pointer-events: none;
 }
 
 .cart-header h2,
 .favorites-header h2 {
     margin: 0;
-    font-size: 1.3rem;
-    color: #2c3e50;
+    font-size: 1.4rem;
+    color: white;
+    font-weight: 700;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cart-header h2::before {
+    content: '🛒';
+    font-size: 1.2rem;
+}
+
+.favorites-header h2::before {
+    content: '❤️';
+    font-size: 1.2rem;
 }
 
 .close-btn {
-    background: none;
+    background: rgba(255, 255, 255, 0.2);
     border: none;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     cursor: pointer;
-    color: #6c757d;
-    padding: 0.5rem;
-    border-radius: 8px;
-    transition: background-color 0.3s ease;
+    color: white;
+    padding: 0.75rem;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .close-btn:hover {
-    background-color: #f8f9fa;
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
 }
 
 .cart-content,
@@ -799,6 +834,29 @@ section h2 {
     flex: 1;
     padding: 1.5rem;
     overflow-y: auto;
+    background: transparent;
+}
+
+.cart-content::-webkit-scrollbar,
+.favorites-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.cart-content::-webkit-scrollbar-track,
+.favorites-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.cart-content::-webkit-scrollbar-thumb,
+.favorites-content::-webkit-scrollbar-thumb {
+    background: #c0392b;
+    border-radius: 3px;
+}
+
+.cart-content::-webkit-scrollbar-thumb:hover,
+.favorites-content::-webkit-scrollbar-thumb:hover {
+    background: #a93226;
 }
 
 .empty-cart,
@@ -806,25 +864,72 @@ section h2 {
     text-align: center;
     padding: 4rem 2rem;
     color: #6c757d;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 15px;
+    margin: 2rem 0;
+    backdrop-filter: blur(10px);
 }
 
 .empty-cart-icon,
 .empty-favorites-icon {
     font-size: 4rem;
     margin-bottom: 1rem;
-    opacity: 0.5;
+    opacity: 0.6;
+    filter: grayscale(0.3);
+}
+
+.empty-cart p,
+.empty-favorites p {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.empty-cart small,
+.empty-favorites small {
+    color: #9ca3af;
+    font-size: 0.9rem;
 }
 
 .cart-footer {
     padding: 1.5rem;
-    border-top: 1px solid #e8e8e8;
-    background: #f8f9fa;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(192, 57, 43, 0.1);
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
 }
 
 .cart-total {
     text-align: center;
-    margin-bottom: 1rem;
-    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+    color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(192, 57, 43, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.cart-total::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.cart-total:hover::before {
+    left: 100%;
+}
+
+.cart-total strong {
+    font-size: 1.3rem;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 /* ===================================
@@ -1153,6 +1258,61 @@ section h2 {
 .suggestion-category {
     font-size: 0.8rem;
     color: #6c757d;
+}
+
+/* ===================================
+   CONTACT SECTION
+   =================================== */
+
+.contact-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    padding: 5rem 0;
+}
+
+.contact-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.contact-info-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.contact-info-card:hover {
+    transform: translateY(-5px);
+}
+
+.contact-info-card .icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.contact-info-card h3 {
+    color: #2c3e50;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.contact-info-card p {
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+
+.contact-info-card a {
+    color: #c0392b;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.contact-info-card a:hover {
+    color: #e74c3c;
 }
 
 @media (max-width: 480px) {
