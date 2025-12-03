@@ -48,11 +48,10 @@ if (NODE_ENV === 'development') {
 }
 
 // API-reitit (järjestys tärkeä - tarkimmat ensin)
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/admin', require('./routes/admin'));
-app.use('/api/admin', require('./routes/admin-api'));
-app.use('/api/menu', require('./routes/menu'));
-app.use('/api/recipes', require('./routes/recipe'));
+app.use('/api/auth', require('./src/routes/auth'));
+app.use('/api/admin', require('./src/routes/admin-api'));
+app.use('/api/menu', require('./src/routes/menu'));
+app.use('/api/recipes', require('./src/routes/recipe'));
 
 // API base route - return basic info instead of falling through to HTML
 app.get('/api', (req, res) => {
@@ -71,7 +70,7 @@ app.get('/api', (req, res) => {
 
 // JWT middleware (uses shared JWT_SECRET)
 const jwt = require('jsonwebtoken');
-const { JWT_SECRET } = require('./routes/shared');
+const { JWT_SECRET } = require('./src/routes/shared');
 
 function authMiddleware(req, res, next) {
     const auth = req.headers.authorization;

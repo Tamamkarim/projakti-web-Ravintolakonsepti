@@ -7,7 +7,13 @@ export function addToCart(dish, qty=1){
   const cart = loadCart();
   const item = cart.find(i=>i.id===dish.id);
   if(item) item.qty += qty;
-  else cart.push({ id:dish.id, name: dish.name_fi||dish.name_en||'Ruoka', price: dish.price||0, qty, image: dish.image_url||''});
+  else cart.push({ 
+    id: dish.id || dish.recipe_id, 
+    name: dish.name || dish.recipe_name || dish.name_fi || dish.name_en || 'Ruoka', 
+    price: parseFloat(dish.price) || 0, 
+    qty, 
+    image: dish.image || dish.image_url || ''
+  });
   saveCart(cart);
   // تحديث واجهة السلة بعد الإضافة
   if (typeof window.updateCartUI === 'function') {
@@ -45,7 +51,7 @@ export function clearCart(){
   return []; 
 }
 export function cartTotal(cart){
-  return (cart||loadCart()).reduce((s,i)=>s + (i.price||0) * (i.qty||1), 0);
+  return (cart||loadCart()).reduce((s,i)=>s + (parseFloat(i.price)||0) * (parseInt(i.qty)||1), 0);
 }
 
 // Make functions globally available for main-clean.js

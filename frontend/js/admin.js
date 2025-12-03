@@ -304,7 +304,7 @@ class AdminPanel {
         </div>
         <div class="order-details">
           <span class="order-status status-${order.status}">${this.getStatusText(order.status)}</span>
-          <span class="order-total">${order.totalAmount.toFixed(2)} €</span>
+          <span class="order-total">${parseFloat(order.totalAmount || order.total_amount || 0).toFixed(2)} €</span>
         </div>
       </div>
     `).join('');
@@ -419,7 +419,7 @@ class AdminPanel {
           </div>
         </td>
         <td>${this.getCategoryName(recipe.category)}</td>
-        <td>${recipe.price.toFixed(2)} €</td>
+        <td>${parseFloat(recipe.price || 0).toFixed(2)} €</td>
         <td>
           <span class="status-badge ${recipe.isAvailable ? 'available' : 'unavailable'}">
             ${recipe.isAvailable ? 'Saatavilla' : 'Ei saatavilla'}
@@ -529,13 +529,13 @@ class AdminPanel {
           <h4>Tilauksen sisältö:</h4>
           <ul>
             ${order.items.map(item => `
-              <li>${item.quantity}x ${item.recipeName} - ${item.total.toFixed(2)} €</li>
+              <li>${item.quantity}x ${item.recipeName} - ${parseFloat(item.total || item.subtotal || 0).toFixed(2)} €</li>
             `).join('')}
           </ul>
         </div>
         
         <div class="order-total">
-          <strong>Yhteensä: ${order.totalAmount.toFixed(2)} €</strong>
+          <strong>Yhteensä: ${parseFloat(order.totalAmount || order.total_amount || 0).toFixed(2)} €</strong>
         </div>
         
         <div class="order-status">

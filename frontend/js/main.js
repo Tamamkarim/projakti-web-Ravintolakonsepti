@@ -177,14 +177,18 @@ function initializeModernApp() {
                                 (item.nameEn && item.nameEn.toLowerCase().includes(query));
                 
                 // Haku kuvauksessa
-                const descMatch = item.description.toLowerCase().includes(query);
+                const descMatch = item.description && item.description.toLowerCase().includes(query);
                 
                 // Haku ainesosissa
                 const ingredientMatch = item.ingredients && 
-                                      item.ingredients.some(ing => ing.toLowerCase().includes(query));
+                                      Array.isArray(item.ingredients) &&
+                                      item.ingredients.some(ing => 
+                                        typeof ing === 'string' && ing.toLowerCase().includes(query)
+                                      );
                 
-                // Haku kategoriassa
-                const categoryMatch = item.category && item.category.toLowerCase().includes(query);
+                // Haku kategoriassa (support both string and number)
+                const categoryMatch = item.category && 
+                                    String(item.category).toLowerCase().includes(query);
                 
                 // Sumea haku (fuzzy search) nimille
                 const fuzzyNameMatch = fuzzySearch(query, item.name.toLowerCase()) ||
@@ -486,9 +490,12 @@ function initializeModernApp() {
         if (appState.currentCategory === 'all') {
             appState.filteredMenu = appState.menu;
         } else {
-            appState.filteredMenu = appState.menu.filter(item => 
-                item.category === appState.currentCategory
-            );
+            appState.filteredMenu = appState.menu.filter(item => {
+                // Support both string and number comparison
+                const itemCategory = String(item.category || '');
+                const selectedCategory = String(appState.currentCategory || '');
+                return itemCategory === selectedCategory;
+            });
         }
         renderMenu();
     }
@@ -505,20 +512,37 @@ function initializeModernApp() {
             const menuData = await fetchTodayMenu();
             console.log('📋 Ruokalista ladattu:', menuData.length, 'tuotetta');
             
-            appState.menu = menuData.map(item => ({
-                ...item,
-                // Ensure Finnish translations
-                name: item.name_fi || item.name,
-                description: item.description_fi || item.description,
-                // Add default values
-                category: item.category || 'mains',
-                vegan: item.vegan || false,
-                vegetarian: item.vegetarian || false,
-                glutenFree: item.glutenFree || false,
-                lactoseFree: item.lactoseFree || false,
-                allergens: item.allergens || [],
-                ingredients: item.ingredients || []
-            }));
+            appState.menu = menuData.map(item => {
+                // Process ingredients - convert from MySQL format to array of strings
+                let ingredients = [];
+                if (Array.isArray(item.ingredients)) {
+                    ingredients = item.ingredients.map(ing => {
+                        if (typeof ing === 'object' && ing !== null) {
+                            return ing.ingredient_name || ing.name || String(ing);
+                        }
+                        return String(ing);
+                    });
+                }
+                
+                return {
+                    ...item,
+                    // Map MySQL database fields to frontend format
+                    id: item.recipe_id || item.id,
+                    name: item.recipe_name || item.name_fi || item.name,
+                    nameEn: item.recipe_name_en || item.name_en || item.name,
+                    description: item.description || item.description_fi || '',
+                    price: parseFloat(item.price) || 0,
+                    image: item.image_url || item.image || 'assets/img/placeholder.jpg',
+                    // Add default values
+                    category: item.category_id || item.category || 'mains',
+                    vegan: item.vegan || false,
+                    vegetarian: item.vegetarian || false,
+                    glutenFree: item.glutenFree || item.gluten_free || false,
+                    lactoseFree: item.lactoseFree || item.lactose_free || false,
+                    allergens: item.allergens || [],
+                    ingredients: ingredients
+                };
+            });
             
             appState.filteredMenu = appState.menu;
             renderMenu();
@@ -572,7 +596,7 @@ function initializeModernApp() {
                     <div class="menu-item-header">
                         <div>
                             <h3 class="menu-item-title">${escapeHtml(item.name)}</h3>
-                            <div class="menu-item-price">${item.price.toFixed(2)} €</div>
+                            <div class="menu-item-price">${parseFloat(item.price || 0).toFixed(2)} €</div>
                         </div>
                         <button class="favorite-btn ${appState.favorites.includes(item.id) ? 'active' : ''}" 
                                 onclick="toggleFavorite('${item.id}')" 
@@ -690,7 +714,7 @@ function initializeModernApp() {
                                  class="cart-item-image">
                             <div class="cart-item-details">
                                 <h4>${escapeHtml(cartItem.name || item.name)}</h4>
-                                <p class="cart-item-price">${(cartItem.price || item.price || 0).toFixed(2)} €</p>
+                                <p class="cart-item-price">${parseFloat(cartItem.price || item.price || 0).toFixed(2)} €</p>
                             </div>
                             <div class="cart-item-controls">
                                 <button onclick="updateCartQuantity('${cartItem.id}', ${cartItem.qty - 1})" class="qty-btn">-</button>
@@ -796,7 +820,7 @@ function initializeModernApp() {
                              class="favorite-item-image">
                         <div class="favorite-item-details">
                             <h4>${escapeHtml(item.name)}</h4>
-                            <p class="favorite-item-price">${item.price.toFixed(2)} €</p>
+                            <p class="favorite-item-price">${parseFloat(item.price || 0).toFixed(2)} €</p>
                         </div>
                         <div class="favorite-item-actions">
                             <button onclick="addToCartFromMenu('${itemId}')" class="btn primary small">Lisää koriin</button>
@@ -863,7 +887,7 @@ function initializeModernApp() {
         try {
             document.getElementById('loadingIndicator').style.display = 'flex';
             
-            const response = await loginUser(email, password);
+            const response = await loginUser({ email, password });
             console.log('✅ Kirjautuminen onnistui:', response);
             
             localStorage.setItem('jwt_token', response.token);
@@ -1041,7 +1065,7 @@ function initializeModernApp() {
                     <img src="${item.image || 'assets/img/placeholder.jpg'}" alt="${escapeHtml(item.name)}" class="item-detail-image">
                     <div class="item-detail-info">
                         <p class="item-description">${escapeHtml(item.description)}</p>
-                        <div class="item-price">${item.price.toFixed(2)} €</div>
+                        <div class="item-price">${parseFloat(item.price || 0).toFixed(2)} €</div>
                         <div class="item-tags">
                             ${item.vegan ? '<span class="tag vegan">🌱 Vegaani</span>' : ''}
                             ${item.vegetarian ? '<span class="tag vegetarian">🥬 Kasvis</span>' : ''}

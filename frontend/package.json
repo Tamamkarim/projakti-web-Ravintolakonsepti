@@ -1,0 +1,43 @@
+{
+  "name": "apricus-ravintola",
+  "version": "1.0.0",
+  "description": "🍽️ Apricus - Kahvila & Ravintola | Moderni web-sovellus ravintolan hallintaan ja asiakaspalveluun suomalaisilla makuelämyksillä",
+  "main": "Backend/server.js",
+  "scripts": {
+    "start": "node Backend/server.js",
+    "dev": "nodemon Backend/server.js",
+    "backend": "cd Backend && npm run dev",
+    "install-backend": "cd Backend && npm install",
+    "install-all": "npm install && npm run install-backend",
+    "build": "echo '🏗️ Rakennetaan frontend...' && echo '✅ Frontend valmis'",
+    "serve": "npm start",
+    "clean": "echo '🧹 Siivotaan projekti...' && echo '✅ Projekti siivottu'"
+  },
+  "keywords": [
+    "ravintola",
+    "ruoka",
+    "menu",
+    "tilaaminen",
+    "nodejs",
+    "express",
+    "kahvila",
+    "apricus",
+    "suomi",
+    "finnish"
+  ],
+  "author": "Tamam",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "fs-extra": "^11.3.2",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
