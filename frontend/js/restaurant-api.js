@@ -3,7 +3,7 @@ class RestaurantAPI {
   constructor() {
     this.baseURL = window.location.origin + '/api';
     // Etsi token eri paikoista
-    this.token = localStorage.getItem('jwt_token') || localStorage.getItem('authToken');
+    this.token = localStorage.getItem('jwt_token');
   }
 
   // Tokenin asetus
@@ -11,10 +11,10 @@ class RestaurantAPI {
     this.token = token;
     if (token) {
       localStorage.setItem('jwt_token', token);
-      localStorage.setItem('authToken', token); // Yhteensopivuus vanhan järjestelmän kanssa
+      // Ei enää yhteensopivuutta authTokenin kanssa
     } else {
       localStorage.removeItem('jwt_token');
-      localStorage.removeItem('authToken');
+      // Ei enää yhteensopivuutta authTokenin kanssa
     }
   }
 

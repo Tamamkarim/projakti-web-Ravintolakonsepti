@@ -1,3 +1,95 @@
+body.admin-body {
+    font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+    background: #f4f6fb;
+    color: #222;
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2, h3, h4 {
+    font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+    font-weight: 700;
+    color: #e1701a;
+    margin-bottom: 1rem;
+}
+
+label {
+    font-weight: 500;
+    color: #495057;
+}
+
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+.modal-content.login-modal {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(162,89,198,0.15);
+    padding: 2rem 2.5rem;
+    max-width: 400px;
+    margin: 2rem auto;
+}
+
+.modal-overlay {
+    background: rgba(162,89,198,0.08);
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.admin-section {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(162,89,198,0.08);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(225,112,26,0.08);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.stat-icon {
+    font-size: 2.2rem;
+    color: #a259c6;
+    background: #f4f6fb;
+    border-radius: 50%;
+    padding: 0.7rem;
+    box-shadow: 0 2px 8px rgba(162,89,198,0.08);
+}
+/* Modern Admin Login Button */
+.admin-login-btn {
+  background: linear-gradient(90deg, #a259c6 0%, #e1701a 100%);
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 12px;
+  padding: 0.8rem 2rem;
+  box-shadow: 0 4px 16px rgba(162,89,198,0.15);
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.admin-login-btn:hover {
+  background: linear-gradient(90deg, #e1701a 0%, #a259c6 100%);
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 8px 24px rgba(162,89,198,0.25);
+}
+
 /* Admin Panel Styles */
 
 .admin-header {

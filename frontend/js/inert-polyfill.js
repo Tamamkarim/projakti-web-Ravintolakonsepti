@@ -7,7 +7,7 @@
         return;
     }
     
-    console.warn('⚠️ inert غير مدعوم أصلياً، استخدام polyfill');
+    console.warn('⚠️    polyfill');
     
     // Simple inert polyfill
     Object.defineProperty(HTMLElement.prototype, 'inert', {
@@ -56,5 +56,5 @@
         el.inert = true;
     });
     
-    console.log('✅ inert polyfill تم تحميله');
+    console.log('✅ inert polyfill');
 })();

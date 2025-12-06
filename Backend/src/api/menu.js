@@ -1,7 +1,7 @@
 
 const express = require('express');
 const router = express.Router();
-const db = require('../../database/mysql-db');
+const db = require('../../database/db');
 const { validateRequired } = require('../../middleware/validation');
 
 // Hae kaikki kategoriat
@@ -71,13 +71,14 @@ router.get('/categories/:id/recipes', async (req, res) => {
 				count: recipes.length
 			}
 		});
-	} catch (error) {
-		console.error('خطأ في جلب وصفات الفئة:', error);
-		res.status(500).json({
-			success: false,
-			error: 'خطأ في جلب وصفات الفئة'
-		});
-	}
+	   } catch (error) {
+		   console.error('Virhe kategorian reseptien haussa:', error);
+		   res.status(500).json({
+			   success: false,
+			   error: 'Virhe haettaessa kategorian reseptejä',
+			   details: error && error.message ? error.message : error
+		   });
+	   }
 });
 
 // Hae kaikki reseptit
@@ -183,14 +184,18 @@ router.get('/today', async (req, res) => {
 				generatedAt: new Date().toISOString()
 			}
 		});
-	} catch (error) {
-		console.error('خطأ في جلب قائمة اليوم:', error);
-		res.status(500).json({
-			success: false,
-			error: 'خطأ في جلب قائمة اليوم'
-		});
-	}
-});
+	   } catch (error) {
+		   console.error('خطأ في جلب قائمة اليوم:', error);
+		   if (error && error.stack) {
+			   console.error('Stack trace:', error.stack);
+		   }
+		   res.status(500).json({
+			   success: false,
+			   error: 'خطأ في جلب قائمة اليوم',
+			   details: error && error.message ? error.message : error
+		   });
+	   }
+	});
 
 // إنشاء طلب جديد
 router.post('/orders', validateRequired(['customerName', 'customerPhone', 'items']), async (req, res) => {

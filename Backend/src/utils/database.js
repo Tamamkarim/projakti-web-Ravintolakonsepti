@@ -25,6 +25,21 @@ async function getAllMenuItems() {
 	return rows;
 }
 
+// جلب كل الوصفات (recipes)
+async function getAllRecipes() {
+	const [rows] = await pool.query('SELECT * FROM recipes');
+	return rows;
+}
+
+// جلب كل الفئات (categories)
+async function getAllCategories() {
+	const [rows] = await pool.query('SELECT * FROM categories');
+	return rows;
+}
+
 module.exports = {
-	getAllMenuItems
+	pool,
+	getAllMenuItems,
+	getAllRecipes,
+	getAllCategories
 };

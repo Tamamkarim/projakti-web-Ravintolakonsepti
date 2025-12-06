@@ -109,7 +109,7 @@ class RecipeCard extends BaseComponent {
     this.element = this.createElement('div', 'recipe-card');
     this.element.innerHTML = `
       <div class="recipe-image">
-        <img src="${recipe.image || '/assets/img/placeholder.jpg'}" alt="${recipe.name}" loading="lazy">
+        <img src="assets/img/${recipe.image ? recipe.image : 'placeholder.jpg'}" alt="${recipe.name}" loading="lazy" onerror="this.onerror=null;this.src='assets/img/placeholder.jpg';">
         <div class="recipe-rating">
           <span class="stars">${this.generateStars(recipe.rating || 0)}</span>
           <span class="rating-text">${recipe.rating || 0}</span>
@@ -182,10 +182,10 @@ class CartItem extends BaseComponent {
     const { item } = this.props;
     
     this.element = this.createElement('div', 'cart-item');
-    this.element.innerHTML = `
-      <div class="item-image">
-        <img src="${item.image || '/assets/img/placeholder.jpg'}" alt="${item.name}">
-      </div>
+      this.element.innerHTML = `
+        <div class="item-image">
+          <img src="${item.image ? item.image : 'assets/img/placeholder.jpg'}" alt="${item.name}" onerror="this.onerror=null;this.src='assets/img/placeholder.jpg';">
+        </div>
       <div class="item-details">
         <h4 class="item-name">${item.name}</h4>
         <p class="item-price">${item.price} ريال</p>
@@ -206,18 +206,25 @@ class CartItem extends BaseComponent {
     const plusBtn = this.element.querySelector('.plus');
     const removeBtn = this.element.querySelector('.remove-item');
 
-    this.addEventListener(minusBtn, 'click', () => {
-      appState.updateCartQuantity(item.id, item.quantity - 1);
-    });
+      this.addEventListener(minusBtn, 'click', () => {
+        if (typeof window.updateCartQuantity === 'function') {
+          window.updateCartQuantity(item.id, item.quantity - 1);
+        }
+      });
 
-    this.addEventListener(plusBtn, 'click', () => {
-      appState.updateCartQuantity(item.id, item.quantity + 1);
-    });
+      this.addEventListener(plusBtn, 'click', () => {
+        if (typeof window.updateCartQuantity === 'function') {
+          window.updateCartQuantity(item.id, item.quantity + 1);
+        }
+      });
 
-    this.addEventListener(removeBtn, 'click', () => {
-      appState.removeFromCart(item.id);
-      notifications.info(`تم إزالة ${item.name} من السلة`);
-    });
+      this.addEventListener(removeBtn, 'click', () => {
+        if (typeof window.removeFromCartCompletely === 'function') {
+          window.removeFromCartCompletely(item.id);
+        } else if (typeof appState.removeFromCart === 'function') {
+          appState.removeFromCart(item.id);
+        }
+      });
   }
 }
 

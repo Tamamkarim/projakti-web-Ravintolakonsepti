@@ -1,3 +1,12 @@
+// Tee funktiot saataville window-oliolla
+// مسح السلة تلقائياً عند بداية التطبيق
+localStorage.removeItem('rm_cart_v1');
+window.loadCart = loadCart;
+window.addToCart = addToCart;
+window.removeFromCart = removeFromCart;
+window.updateQty = updateQty;
+window.clearCart = clearCart;
+window.cartTotal = cartTotal;
 const CART_KEY = 'rm_cart_v1';
 export function loadCart(){
   try{ return JSON.parse(localStorage.getItem(CART_KEY)||'[]'); }catch(e){ return [] }
@@ -12,7 +21,7 @@ export function addToCart(dish, qty=1){
     name: dish.name || dish.recipe_name || dish.name_fi || dish.name_en || 'Ruoka', 
     price: parseFloat(dish.price) || 0, 
     qty, 
-    image: dish.image || dish.image_url || ''
+    image: dish.image ? dish.image : (dish.image_url ? dish.image_url : 'placeholder.jpg')
   });
   saveCart(cart);
   // تحديث واجهة السلة بعد الإضافة
@@ -23,7 +32,8 @@ export function addToCart(dish, qty=1){
 }
 export function removeFromCart(dishId){
   let cart = loadCart();
-  cart = cart.filter(i=>i.id!==dishId);
+  // تأكد أن المقارنة تتم باستخدام نص
+  cart = cart.filter(i => String(i.id) !== String(dishId));
   saveCart(cart);
   // تحديث واجهة السلة بعد الحذف
   if (typeof window.updateCartUI === 'function') {
@@ -32,11 +42,31 @@ export function removeFromCart(dishId){
   return cart;
 }
 export function updateQty(dishId, qty){
-  const cart = loadCart();
-  const it = cart.find(i=>i.id===dishId);
-  if(it) it.qty = Math.max(1, qty);
-  saveCart(cart);
-  // تحديث واجهة السلة بعد تغيير الكمية
+  console.log('updateQty called with:', dishId, qty);
+  let cart = loadCart();
+  // تأكد أن dishId يتم تحويله إلى نص للمقارنة الصحيحة
+  const it = cart.find(i => String(i.id) === String(dishId));
+  if(it) {
+    const oldQty = it.qty;
+    if (qty < 1) {
+      cart = cart.filter(i => String(i.id) !== String(dishId));
+      saveCart(cart);
+      if (typeof showNotification === 'function') {
+        showNotification('Tuote poistettu korista', 'info');
+      }
+    } else {
+      it.qty = qty;
+      saveCart(cart);
+      if (typeof showNotification === 'function') {
+        if (qty > oldQty) {
+          showNotification('Määrää lisätty korissa', 'info');
+        } else if (qty < oldQty) {
+          showNotification('Määrää vähennetty korissa', 'info');
+        }
+      }
+    }
+  }
+  // تحديث واجهة السلة بعد تغيير الكمية أو الحذف
   if (typeof window.updateCartUI === 'function') {
     window.updateCartUI();
   }
@@ -55,10 +85,3 @@ export function cartTotal(cart){
 }
 
 // Make functions globally available for main-clean.js
-window.loadCart = loadCart;
-window.saveCart = saveCart;
-window.addToCart = addToCart;
-window.removeFromCart = removeFromCart;
-window.updateQty = updateQty;
-window.clearCart = clearCart;
-window.cartTotal = cartTotal;

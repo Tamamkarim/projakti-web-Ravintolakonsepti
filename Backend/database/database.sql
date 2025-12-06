@@ -1,10 +1,23 @@
+INSERT INTO users (email, password_hash, name, phone, is_admin, is_active, last_login) VALUES
+('admin@apricus.fi', '$2b$10$abcdefghijklmnopqrstuv', 'Karim Admin', '+358123456789', TRUE, TRUE, NOW()),
+('john.doe@email.com', '$2b$10$xyz123456789abcdefghij', 'John Doe', '+358987654321', FALSE, TRUE, NOW()),
+('maria.garcia@email.com', '$2b$10$qwerty123456789abcdefg', 'Maria Garcia', '+358555123456', FALSE, TRUE, NULL),
+('ahmed.hassan@email.com', '$2b$10$zxcvbn123456789abcdefg', 'Ahmed Hassan', '+358444987654', FALSE, TRUE, '2025-11-24 18:30:00'),
+('sara.virtanen@email.com', '$2b$10$mnbvcx123456789abcdefg', 'Sara Virtanen', '+358333456789', FALSE, TRUE, '2025-11-25 10:15:00'),
+('karim@email.com', '$2b$10$w1Qw8Qn8QwQwQwQwQwQwQeQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQ', 'Karim', '+358000000000', FALSE, TRUE, NOW());
+-- تحديث مسarat الصور للأطباق
+UPDATE recipes SET image_url = 'assets/img/Fattoush-salaatti.jpg' WHERE recipe_name = 'Fattoush-salaatti';
+UPDATE recipes SET image_url = 'assets/img/Grillattu lihakebab.jpg' WHERE recipe_name = 'Grillattu lihakebab';
+UPDATE recipes SET image_url = 'assets/img/Shawarma-lautanen.jpg' WHERE recipe_name = 'Shawarma-lautanen';
+UPDATE recipes SET image_url = 'assets/img/Falafel-lautanen.jpg' WHERE recipe_name = 'Falafel-lautanen';
+
 -- Create the database if it doesn't exist
-DROP DATABASE IF EXISTS apricus_restaurant;
-CREATE DATABASE apricus_restaurant CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE apricus_restaurant;
+DROP DATABASE IF EXISTS web_ravintola;
+CREATE DATABASE web_ravintola;تر
+USE web_ravintola;
 
 
-----------------
+-- --------------
 CREATE TABLE users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -77,7 +90,7 @@ CREATE TABLE ingredients (
     INDEX idx_is_available (is_available)
 ) ENGINE=InnoDB;
 
--
+
 -- ----------------------------------------------------------------------------
 CREATE TABLE recipe_ingredients (
     recipe_ingredient_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -174,13 +187,9 @@ CREATE TABLE sessions (
 
 
 -- ----------------------------------------------------------------------------
-INSERT INTO users (email, password_hash, name, phone, is_admin, last_login) VALUES
-('admin@apricus.fi', '$2b$10$abcdefghijklmnopqrstuv', 'Karim Admin', '+358123456789', TRUE, NOW()),
-('john.doe@email.com', '$2b$10$xyz123456789abcdefghij', 'John Doe', '+358987654321', FALSE, NOW()),
-('maria.garcia@email.com', '$2b$10$qwerty123456789abcdefg', 'Maria Garcia', '+358555123456', FALSE, NULL),
-('ahmed.hassan@email.com', '$2b$10$zxcvbn123456789abcdefg', 'Ahmed Hassan', '+358444987654', FALSE, '2025-11-24 18:30:00'),
-('sara.virtanen@email.com', '$2b$10$mnbvcx123456789abcdefg', 'Sara Virtanen', '+358333456789', FALSE, '2025-11-25 10:15:00'),
-('karim@email.com', '$2b$10$w1Qw8Qn8QwQwQwQwQwQwQeQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQwQ', 'Karim', '+358000000000', FALSE, TRUE, NOW());
+INSERT INTO users (email, password_hash, name, phone, is_admin, is_active, last_login) VALUES
+('admin@apricus.fi', '$2b$10$abcdefghijklmnopqrstuv', 'Karim Admin', '+358123456789', TRUE, TRUE, NOW()),
+('admin2@email.com', '12345678', 'Admin Two', '+358111111111', TRUE, TRUE, NOW());
 
 -- ----------------------------------------------------------------------------
 -- INSERT: Categories
@@ -305,7 +314,8 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit) VALUES
 -- Hibiskustee (recipe_id: 8)
 (8, 36, 20, 'g'),   -- Hibiskus
 (8, 28, 10, 'g'),   -- Minttu
-(8, 17, 20, 'g');   --- Sokeri  
+(8, 17, 20, 'g');   -- Sokeri  
+
 
 -- ----------------------------------------------------------------------------
 -- INSERT: Orders
@@ -407,7 +417,7 @@ ORDER BY i.ingredient_name;
 INSERT INTO orders (user_id, customer_name, customer_phone, customer_email, order_type, total_amount, order_status, notes)
 VALUES (3, 'Maria Garcia', '+358555123456', 'maria.garcia@email.com', 'pickup', 26.00, 'pending', 'Please call when ready');
 
--- Then, insert order items (assuming order_id = 6)
+-- Then, insert order items (assuming order_id = LAST_INSERT_ID())
 INSERT INTO order_items (order_id, recipe_id, recipe_name, quantity, unit_price, subtotal)
 VALUES 
     (LAST_INSERT_ID(), 4, 'Hummus tahinin kanssa', 1, 18.00, 18.00),
@@ -436,7 +446,7 @@ UPDATE orders
 SET order_status = 'ready'
 WHERE order_id = 4 AND order_status = 'preparing';
 
-------------
+-- ----------
 UPDATE orders 
 SET 
     order_status = 'completed',
@@ -462,7 +472,7 @@ SET
     )
 WHERE recipe_id = 1;
 
---------------------------------------------------------------------------
+-- ------------------------------------------------------------------------
 SELECT 
     recipe_id,
     recipe_name,
@@ -479,7 +489,7 @@ WHERE
 ORDER BY average_rating DESC;
 
 
----------------------------------------
+-- ------------------------------------------------------------------------
 SELECT 
     r.recipe_name,
     r.recipe_name_en,
@@ -514,7 +524,7 @@ SET i.stock_quantity = i.stock_quantity - (ri.quantity * 1) -- 1 = quantity orde
 WHERE ri.recipe_id = 2;
 
 
------------------------------------------------
+-- ------------------------------------------------------------------------
 SELECT 
     o.order_id,
     o.order_date,
@@ -641,7 +651,9 @@ JOIN categories c ON r.category_id = c.category_id
 WHERE r.is_available = TRUE AND c.is_active = TRUE
 ORDER BY c.display_order, r.recipe_name;
 
---------------------------------------------------
+-- ------------------------------------------------------------------------
+
+
 CREATE OR REPLACE VIEW vw_order_summary AS
 SELECT 
     o.order_id,
@@ -745,6 +757,6 @@ SELECT 'reviews', COUNT(*) FROM reviews
 UNION ALL
 SELECT 'sessions', COUNT(*) FROM sessions;
 
-     
-
-
+SELECT user_id, email, is_active, password_hash
+FROM users
+WHERE email = 'sahkoposti@esimerkki.com';

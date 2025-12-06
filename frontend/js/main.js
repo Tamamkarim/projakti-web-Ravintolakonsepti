@@ -401,20 +401,17 @@ function initializeModernApp() {
         console.log('🔧 Käytetään suodattimia:', appState.filters);
         
         appState.filteredMenu = appState.menu.filter(item => {
-            // Category filter
-            if (appState.currentCategory !== 'all' && item.category !== appState.currentCategory) {
+            // Category filter (use category_id for matching)
+            if (appState.currentCategory !== 'all' && String(item.category_id) !== String(appState.currentCategory)) {
                 return false;
             }
-            
             // Dietary filters
             if (appState.filters.vegan && !item.vegan) return false;
             if (appState.filters.vegetarian && !item.vegetarian) return false;
             if (appState.filters.glutenFree && !item.glutenFree) return false;
             if (appState.filters.lactoseFree && !item.lactoseFree) return false;
-            
             // Price filter
             if (item.price > appState.filters.maxPrice) return false;
-            
             // Allergen filter
             if (appState.filters.allergens.length > 0) {
                 const hasAllergen = appState.filters.allergens.some(allergen => 
@@ -422,7 +419,6 @@ function initializeModernApp() {
                 );
                 if (hasAllergen) return false;
             }
-            
             return true;
         });
         
@@ -475,11 +471,10 @@ function initializeModernApp() {
                 // Update active state
                 document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
-                
-                // Update current category
-                appState.currentCategory = e.target.dataset.category;
+                // Update current category (use category_id if available)
+                const catId = e.target.dataset.categoryId || e.target.dataset.category;
+                appState.currentCategory = catId;
                 console.log('📂 Kategoria vaihdettu:', appState.currentCategory);
-                
                 // Filter and render menu
                 filterByCategory();
             });
@@ -532,7 +527,7 @@ function initializeModernApp() {
                     nameEn: item.recipe_name_en || item.name_en || item.name,
                     description: item.description || item.description_fi || '',
                     price: parseFloat(item.price) || 0,
-                    image: item.image_url || item.image || 'assets/img/placeholder.jpg',
+                    image: (item.image_url ? item.image_url.split('/').pop() : (item.image ? item.image.split('/').pop() : 'placeholder.jpg')),
                     // Add default values
                     category: item.category_id || item.category || 'mains',
                     vegan: item.vegan || false,
@@ -586,13 +581,13 @@ function initializeModernApp() {
         }
         
         menuGrid.innerHTML = appState.filteredMenu.map(item => `
-            <div class="menu-item" data-id="${item.id}">
-                <img src="${item.image || 'assets/img/placeholder.jpg'}" 
+              <div class="menu-item" data-id="${item.id}">
+                 <img src="${item.image_url || item.image || 'assets/img/placeholder.jpg'}" 
                      alt="${escapeHtml(item.name)}" 
                      class="menu-item-image"
                      onerror="this.src='assets/img/placeholder.jpg'">
                 
-                <div class="menu-item-content">
+                 <div class="menu-item-content">
                     <div class="menu-item-header">
                         <div>
                             <h3 class="menu-item-title">${escapeHtml(item.name)}</h3>
@@ -673,7 +668,7 @@ function initializeModernApp() {
         const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
         const total = calculateCartTotal();
         
-        console.log('🛒 تحديث واجهة السلة - عدد العناصر:', totalItems, 'السلة:', cart);
+        console.log('🛒 Ostoskorin käyttöliittymän päivitys - tuotteiden määrä:', totalItems, 'ostoskorissa:', cart);
         
         if (cartCount) {
             if (totalItems > 0) {
@@ -704,24 +699,25 @@ function initializeModernApp() {
                 `;
             } else {
                 cartItems.innerHTML = cart.map(cartItem => {
-                    const item = appState.menu.find(m => m.id == cartItem.id);
+                    // ابحث عن العنصر في القائمة باستخدام id كنص
+                    const item = appState.menu.find(m => String(m.id) === String(cartItem.id));
                     if (!item) return '';
-                    
+                    const imageName = cartItem.image || item.image || 'placeholder.jpg';
                     return `
                         <div class="cart-item">
-                            <img src="${cartItem.image || item.image || 'assets/img/placeholder.jpg'}" 
+                            <img src="assets/img/${imageName}" 
                                  alt="${escapeHtml(cartItem.name || item.name)}" 
-                                 class="cart-item-image">
+                                 class="cart-item-image" onerror="this.onerror=null;this.src='assets/img/placeholder.jpg';">
                             <div class="cart-item-details">
                                 <h4>${escapeHtml(cartItem.name || item.name)}</h4>
                                 <p class="cart-item-price">${parseFloat(cartItem.price || item.price || 0).toFixed(2)} €</p>
                             </div>
-                            <div class="cart-item-controls">
-                                <button onclick="updateCartQuantity('${cartItem.id}', ${cartItem.qty - 1})" class="qty-btn">-</button>
+                            <div class="item-quantity">
+                                <button onclick="updateCartQuantity('${cartItem.id}', ${cartItem.qty - 1})" class="quantity-btn minus">-</button>
                                 <span class="quantity">${cartItem.qty}</span>
-                                <button onclick="updateCartQuantity('${cartItem.id}', ${cartItem.qty + 1})" class="qty-btn">+</button>
+                                <button onclick="updateCartQuantity('${cartItem.id}', ${cartItem.qty + 1})" class="quantity-btn plus">+</button>
                             </div>
-                            <button onclick="removeFromCartCompletely('${cartItem.id}')" class="remove-btn" title="Poista korista">
+                            <button onclick="removeFromCartCompletely('${cartItem.id}')" class="remove-item" title="Poista korista">
                                 ×
                             </button>
                         </div>
@@ -911,31 +907,38 @@ function initializeModernApp() {
         const email = document.getElementById('authEmail').value.trim();
         const password = document.getElementById('authPassword').value;
         const isStudent = document.getElementById('authStudent').checked;
-        
+
         if (!name || !email || !password) {
             showNotification('Täytä kaikki kentät rekisteröitymistä varten', 'error');
             return;
         }
-        
+
         if (password.length < 6) {
             showNotification('Salasanan tulee olla vähintään 6 merkkiä pitkä', 'error');
             return;
         }
-        
+
         try {
             document.getElementById('loadingIndicator').style.display = 'flex';
-            
-            const response = await registerUser(name, email, password, isStudent);
+
+            const payload = {
+                name,
+                email,
+                password,
+                phone: isStudent ? 'student' : null
+            };
+            console.log('Register payload:', payload);
+            const response = await registerUser(payload);
             console.log('✅ Rekisteröityminen onnistui:', response);
-            
+
             localStorage.setItem('jwt_token', response.token);
             appState.user = response.user;
-            
+
             updateAuthUI();
             document.getElementById('userDropdown').classList.remove('active');
-            
+
             showNotification(`Tervetuloa, ${response.user.name}! Tilisi on luotu.`, 'success');
-            
+
         } catch (error) {
             console.error('❌ Rekisteröitymisvirhe:', error);
             showNotification('Rekisteröityminen epäonnistui: ' + error.message, 'error');
@@ -1030,19 +1033,21 @@ function initializeModernApp() {
     };
 
     window.updateCartQuantity = function(itemId, newQuantity) {
-        if (newQuantity <= 0) {
-            removeFromCart(itemId);
-        } else {
-            updateQty(itemId, newQuantity);
+        // استخدم updateQty دائماً، فهي تحذف العنصر إذا أصبحت الكمية أقل من 1
+        updateQty(itemId, newQuantity);
+        // إعادة رسم السلة مباشرة بعد التغيير
+        if (typeof window.updateCartUI === 'function') {
+            window.updateCartUI();
         }
-        // لا حاجة لاستدعاء updateCartUI هنا لأنه يتم استدعاؤه تلقائياً في cart.js
     };
 
     window.removeFromCartCompletely = function(itemId) {
         const item = appState.menu.find(m => m.id == itemId);
         removeFromCart(itemId);
-        // لا حاجة لاستدعاء updateCartUI هنا لأنه يتم استدعاؤه تلقائياً في cart.js
-        
+        // إعادة رسم السلة مباشرة بعد الحذف
+        if (typeof window.updateCartUI === 'function') {
+            window.updateCartUI();
+        }
         if (item) {
             showNotification(`${item.name} poistettu korista`, 'info');
         }

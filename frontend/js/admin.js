@@ -114,7 +114,7 @@ class AdminPanel {
   }
 
   checkAuthentication() {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('jwt_token');
     if (token) {
       api.setToken(token);
       this.isLoggedIn = true;
@@ -820,4 +820,16 @@ document.addEventListener('DOMContentLoaded', () => {
 function closeRecipeModal() {
   const modal = document.getElementById('recipeModal');
   if (modal) modal.style.display = 'none';
+}
+
+async function fetchOrders() {
+  try {
+    const response = await fetch('http://localhost:3000/api/orders');
+    if (!response.ok) throw new Error('حدث خطأ في جلب البيانات');
+    const orders = await response.json();
+    // هنا يمكنك عرض الطلبات في الصفحة
+    console.log(orders);
+  } catch (error) {
+    console.error(error);
+  }
 }

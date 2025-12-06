@@ -3,6 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const menuRoutes = require('./routers/menu-Routes');
+const orderRoutes = require('./routers/order-Routes');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -13,6 +14,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Routes
+
+// إضافة مسار الطلبات
+app.use('/api/orders', orderRoutes);
 app.use('/api/menu', menuRoutes);
 
 // Health check

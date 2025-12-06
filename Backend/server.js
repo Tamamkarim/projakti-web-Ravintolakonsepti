@@ -1,7 +1,8 @@
+// Tämä tiedosto on tarkoituksella tyhjä.
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
-const dotenv = require('dotenv').config();
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -20,20 +21,19 @@ app.use((req, res, next) => {
     res.header('X-XSS-Protection', '1; mode=block');
     
     if (req.method === 'OPTIONS') {
-        res.sendStatus(200);
-    } else {
-        next();
+        return res.sendStatus(200);
     }
+    next();
 });
 
 // Body parser middleware
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
-// Lisää middleware turvallisuudelle ja validoinnille
+// (Jos sulla on nämä middlewaret, voit käyttää niitä)
 const { rateLimit, errorLogger } = require('./middleware/validation');
 
-// Frontend-tiedostojen palvelu välimuistin hallinnalla
+// Frontend-tiedostojen palvelu
 app.use(express.static(path.join(__dirname, '../frontend'), {
     maxAge: NODE_ENV === 'production' ? '1d' : '0',
     etag: false
@@ -47,13 +47,13 @@ if (NODE_ENV === 'development') {
     });
 }
 
-// API-reitit (järjestys tärkeä - tarkimmat ensin)
-app.use('/api/auth', require('./src/routes/auth'));
-app.use('/api/admin', require('./src/routes/admin-api'));
-app.use('/api/menu', require('./src/routes/menu'));
-app.use('/api/recipes', require('./src/routes/recipe'));
+// API-reitit
+app.use('/api/auth', require('./src/api/auth'));
+app.use('/api/admin', require('./src/api/admin-api'));
+app.use('/api/menu', require('./src/api/menu'));
+// app.use('/api/recipes', require('./src/routes/recipe'));
 
-// API base route - return basic info instead of falling through to HTML
+// API base route
 app.get('/api', (req, res) => {
     res.json({
         success: true,
@@ -68,14 +68,13 @@ app.get('/api', (req, res) => {
     });
 });
 
-// JWT middleware (uses shared JWT_SECRET)
+// JWT middleware
 const jwt = require('jsonwebtoken');
-const { JWT_SECRET } = require('./src/routes/shared');
 
 function authMiddleware(req, res, next) {
     const auth = req.headers.authorization;
     if (!auth || !auth.startsWith('Bearer ')) {
-        return res.status(401).json({ error: 'مطلوب تسجيل الدخول' });
+        return res.status(401).json({ error: 'Kirjautuminen vaaditaan' });
     }
     try {
         const decoded = jwt.verify(auth.split(' ')[1], JWT_SECRET);
@@ -83,14 +82,14 @@ function authMiddleware(req, res, next) {
         next();
     } catch (e) {
         console.error('JWT verification failed:', e.message);
-        return res.status(401).json({ error: 'رمز غير صالح' });
+        return res.status(401).json({ error: 'Virheellinen tunnus' });
     }
 }
 
-// مثال لمسار إدارة محمي
+// Esimerkki admin-reitistä
 app.get('/api/admin/secret', authMiddleware, (req, res) => {
     if (!req.user.isAdmin) {
-        return res.status(403).json({ error: 'غير مصرح' });
+        return res.status(403).json({ error: 'Ei oikeutta' });
     }
     res.json({ message: 'Tervetuloa, järjestelmänvalvoja!' });
 });
@@ -104,13 +103,11 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Catch-all käsittelijä: palvele frontend kaikille ei-API reiteille
+// Catch-all: palvele frontend kaikille ei-API reiteille
 app.use((req, res, next) => {
-    // Vältä API-reittien palvelua
     if (req.path.startsWith('/api/')) {
         return res.status(404).json({ error: 'API-päätepistettä ei löydy' });
     }
-    // Palvele index.html muille reiteille
     res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
@@ -124,7 +121,7 @@ const server = app.listen(PORT, () => {
     console.log('==============================');
 });
 
-// Käsittele palvelimen sulkeminen siististi
+// Siisti sulkeminen
 process.on('SIGTERM', () => {
     console.log('SIGTERM vastaanotettu. Suljetaan siististi...');
     server.close(() => {
@@ -140,4 +137,3 @@ process.on('SIGINT', () => {
 });
 
 module.exports = app;
-

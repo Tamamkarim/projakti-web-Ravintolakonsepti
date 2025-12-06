@@ -1,9 +1,34 @@
+
 const express = require('express');
 const router = express.Router();
 
 const { validateRequired } = require('../../middleware/validation');
 
-// ...existing code...
+// حذف طلب
+router.delete('/orders/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    // حذف الطلب من قاعدة البيانات أو المصفوفة
+    const deleted = database.deleteOrder(id);
+    if (deleted) {
+      res.json({
+        success: true,
+        message: 'تم حذف الطلب بنجاح'
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        error: 'الطلب غير موجود'
+      });
+    }
+  } catch (error) {
+    console.error('خطأ في حذف الطلب:', error);
+    res.status(500).json({
+      success: false,
+      error: 'خطأ في حذف الطلب'
+    });
+  }
+});
 
 // تحديث حالة الطلب
 router.patch('/orders/:id/status', validateRequired(['status']), (req, res) => {
