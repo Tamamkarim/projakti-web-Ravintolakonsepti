@@ -155,38 +155,38 @@
                                                                     <input type="checkbox" id="filter-gluten-free">
                                                                 <span data-i18n="glutenFree">🌾 Gluteeniton</span>
                                                         </label>
-                            <label class="filter-option">
-                                  <input type="checkbox" id="filter-lactose-free">
-                                🥛 Laktoositon
+                                                        <label class="filter-option">
+                                                                    <input type="checkbox" id="filter-lactose-free">
+                                                                <span data-i18n="lactoseFree">🥛 Laktoositon</span>
                             </label>
                         </div>
                     </div>
 
                     <div class="filter-group">
-                        <h3>Allergeenit (poissulje)</h3>
+                        <h3 data-i18n="allergens">Allergeenit (poissulje)</h3>
                         <select id="allergenFilter" multiple class="allergen-select">
-                            <option value="nuts">🥜 Pähkinät</option>
-                            <option value="fish">🐟 Kala</option>
-                            <option value="shellfish">🦐 Äyriäiset</option>
-                            <option value="eggs">🥚 Kananmunat</option>
-                            <option value="soy">🌱 Soija</option>
+                            <option value="nuts" data-i18n="nuts">🥜 Pähkinät</option>
+                            <option value="fish" data-i18n="fish">🐟 Kala</option>
+                            <option value="shellfish" data-i18n="shellfish">🦐 Äyriäiset</option>
+                            <option value="eggs" data-i18n="eggs">🥚 Kananmunat</option>
+                            <option value="soy" data-i18n="soy">🌱 Soija</option>
                         </select>
                     </div>
 
                     <div class="filter-group">
-                        <h3>Hintaluokka</h3>
+                        <h3 data-i18n="priceRange">Hintaluokka</h3>
                         <div class="price-range">
                             <input type="range" id="priceRange" min="0" max="50" value="50" class="price-slider">
                             <div class="price-display">
-                                <span>0€</span>
-                                <span id="maxPrice">50€</span>
+                                <span data-i18n="minPrice">0€</span>
+                                <span id="maxPrice" data-i18n="maxPrice">50€</span>
                             </div>
                         </div>
                     </div>
 
                     <div class="filter-actions">
-                        <button id="applyFilters" class="btn primary">Käytä suodattimet</button>
-                        <button id="clearFilters" class="btn secondary">Tyhjennä</button>
+                        <button id="applyFilters" class="btn primary" data-i18n="applyFilters">Käytä suodattimet</button>
+                        <button id="clearFilters" class="btn secondary" data-i18n="clearFilters">Tyhjennä</button>
                     </div>
                 </div>
             </div>
@@ -195,22 +195,22 @@
         <!-- Menu Section -->
         <section class="menu-section" id="menu">
             <div class="container">
-                <h2>Tämän päivän ruokalista</h2>
+                <h2 data-i18n="todayMenu">Tämän päivän ruokalista</h2>
                 <div class="menu-categories">
-                    <button class="category-btn active" data-category="all">Kaikki</button>
-                    <button class="category-btn" data-category="1">Alkuruoat</button>
-                    <button class="category-btn" data-category="2">Pääruoat</button>
-                    <button class="category-btn" data-category="3">Jälkiruoat</button>
-                    <button class="category-btn" data-category="4">Juomat</button>
-                    <button class="category-btn" data-category="6">Kylmät juomat</button>
-                    <button class="category-btn" data-category="5">Kuumat juomat</button>
+                    <button class="category-btn active" data-category="all" data-i18n="all">Kaikki</button>
+                    <button class="category-btn" data-category="1" data-i18n="starters">Alkuruoat</button>
+                    <button class="category-btn" data-category="2" data-i18n="mainCourses">Pääruoat</button>
+                    <button class="category-btn" data-category="3" data-i18n="desserts">Jälkiruoat</button>
+                    <button class="category-btn" data-category="4" data-i18n="drinks">Juomat</button>
+                    <button class="category-btn" data-category="6" data-i18n="coldDrinks">Kylmät juomat</button>
+                    <button class="category-btn" data-category="5" data-i18n="hotDrinks">Kuumat juomat</button>
                 </div>
                 
                 <div class="menu-grid" id="menuGrid">
                     <!-- Menu items will be loaded here -->
                     <div class="loading-spinner">
                         <div class="spinner"></div>
-                        <p>Ladataan ruokalistaa...</p>
+                        <p data-i18n="loadingMenu">Ladataan ruokalistaa...</p>
                     </div>
                 </div>
             </div>
@@ -221,24 +221,24 @@
             <div class="container">
                 <div class="about-grid">
                     <div class="about-text">
-                        <h2>Tarinmme</h2>
-                        <p>Apricus on syntynyt rakkaudesta hyvään ruokaan ja lämpimään vieraanvaraisuuteen. Tarjoamme ainutlaatuisia makuelämyksiä sydämessä kaupunkia.</p>
-                        <p>Käytämme vain tuoreimpia, paikallisia raaka-aineita ja perinteisiä reseptejä modernilla twistillä.</p>
+                        <h2 data-i18n="ourStory">Tarinmme</h2>
+                        <p data-i18n="aboutText1">Apricus on syntynyt rakkaudesta hyvään ruokaan ja lämpimään vieraanvaraisuuteen. Tarjoamme ainutlaatuisia makuelämyksiä sydämessä kaupunkia.</p>
+                        <p data-i18n="aboutText2">Käytämme vain tuoreimpia, paikallisia raaka-aineita ja perinteisiä reseptejä modernilla twistillä.</p>
                         <div class="features">
                             <div class="feature">
-                                <div class="feature-icon">🌱</div>
-                                <h3>Tuoreet raaka-aineet</h3>
-                                <p>Paikalliset ja sesongin mukaiset ainekset</p>
+                                <div class=" -icon">🌱</div>
+                                <h3 data-i18n="freshIngredients">Tuoreet raaka-aineet</h3>
+                                <p data-i18n="localIngredients">Paikalliset ja sesongin mukaiset ainekset</p>
                             </div>
                             <div class="feature">
                                 <div class="feature-icon">👨‍🍳</div>
-                                <h3>Kokeneet kokit</h3>
-                                <p>Ammattitaitoinen keittiötiimi</p>
+                                <h3 data-i18n="experiencedChefs">Kokeneet kokit</h3>
+                                <p data-i18n="professionalTeam">Ammattitaitoinen keittiötiimi</p>
                             </div>
                             <div class="feature">
                                 <div class="feature-icon">🏡</div>
-                                <h3>Kodikkas tunnelma</h3>
-                                <p>Lämmin ja viihtyisä ympäristö</p>
+                                <h3 data-i18n="cozyAtmosphere">Kodikkas tunnelma</h3>
+                                <p data-i18n="warmAtmosphere">Lämmin ja viihtyisä ympäristö</p>
                             </div>
                         </div>
                     </div>
@@ -253,7 +253,7 @@
     <!-- Cart Sidebar -->
     <aside class="cart-sidebar" id="cartSidebar">
         <div class="cart-header">
-            <h2>Ostoskori</h2>
+            <h2 data-i18n="cart">Ostoskori</h2>
             <button class="close-btn" id="closeCart">
                 <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <line x1="18" y1="6" x2="6" y2="18"/>
@@ -264,16 +264,16 @@
         <div class="cart-content" id="cartItems">
             <div class="empty-cart">
                 <div class="empty-cart-icon">🛒</div>
-                <p>Ostoskorisi on tyhjä</p>
-                <small>Lisää tuotteita ruokalistasta</small>
+                <p data-i18n="emptyCart">Ostoskorisi on tyhjä</p>
+                <small data-i18n="addFromMenu">Lisää tuotteita ruokalistasta</small>
             </div>
         </div>
         <div class="cart-footer">
             <div class="cart-total">
-                <span>Yhteensä: <strong id="cartTotal">0,00 €</strong></span>
+                <span data-i18n="total">Yhteensä: <strong id="cartTotal">0,00 €</strong></span>
             </div>
             <button class="btn primary full-width" id="checkoutBtn" disabled>
-                Siirry kassalle
+                <span data-i18n="checkout">Siirry kassalle</span>
             </button>
         </div>
     </aside>
@@ -281,7 +281,7 @@
     <!-- Favorites Sidebar -->
     <aside class="favorites-sidebar" id="favoritesSidebar">
         <div class="favorites-header">
-            <h2>Suosikit</h2>
+            <h2 data-i18n="favorites">Suosikit</h2>
             <button class="close-btn" id="closeFavorites">
                 <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <line x1="18" y1="6" x2="6" y2="18"/>
@@ -292,8 +292,8 @@
         <div class="favorites-content" id="favoritesList">
             <div class="empty-favorites">
                 <div class="empty-favorites-icon">❤️</div>
-                <p>Ei suosikkeja vielä</p>
-                <small>Lisää suosikkeja klikkaamalla sydäntä</small>
+                <p data-i18n="noFavorites">Ei suosikkeja vielä</p>
+                <small data-i18n="addFavorites">Lisää suosikkeja klikkaamalla sydäntä</small>
             </div>
         </div>
     </aside>
@@ -301,29 +301,29 @@
     <!-- Contact Section -->
     <section class="contact-section" id="yhteystiedot">
         <div class="container">
-            <h2>Yhteystiedot</h2>
+            <h2 data-i18n="contactInfo">Yhteystiedot</h2>
             <div class="contact-grid">
                 <div class="contact-info-card">
                     <div class="icon">📍</div>
-                    <h3>Osoite</h3>
-                    <p>mellunmäki 22, Helsinki</p>
+                    <h3 data-i18n="address">Osoite</h3>
+                    <p data-i18n="addressValue">mellunmäki 22, Helsinki</p>
                 </div>
                 <div class="contact-info-card">
                     <div class="icon">📞</div>
-                    <h3>Puhelin</h3>
-                    <p><a href="tel:+358123456789">+358 4056478</a></p>
+                    <h3 data-i18n="phone">Puhelin</h3>
+                    <p><a href="tel:+358123456789" data-i18n="phoneValue">+358 4056478</a></p>
                 </div>
                 <div class="contact-info-card">
                     <div class="icon">✉️</div>
-                    <h3>Sähköposti</h3>
-                    <p><a href="mailto:tk@gmail.com">tk@gmail.com</a></p>
+                    <h3 data-i18n="email">Sähköposti</h3>
+                    <p><a href="mailto:tk@gmail.com" data-i18n="emailValue">tk@gmail.com</a></p>
                 </div>
                 <div class="contact-info-card">
                     <div class="icon">🕒</div>
-                    <h3>Aukioloajat</h3>
-                    <p>Ma-Pe: 10:00 - 22:00</p>
-                    <p>La: 11:00 - 23:00</p>
-                    <p>Su: 12:00 - 21:00</p>
+                    <h3 data-i18n="openingHours">Aukioloajat</h3>
+                    <p data-i18n="monFri">Ma-Pe: 10:00 - 22:00</p>
+                    <p data-i18n="sat">La: 11:00 - 23:00</p>
+                    <p data-i18n="sun">Su: 12:00 - 21:00</p>
                 </div>
             </div>
         </div>
@@ -334,8 +334,8 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-section">
-                    <h3>Apricus</h3>
-                    <p>Ainutlaatuisia makuelämyksiä sydämessä kaupunkia</p>
+                    <h3 data-i18n="footerBrand">Apricus</h3>
+                    <p data-i18n="footerDesc">Ainutlaatuisia makuelämyksiä sydämessä kaupunkia</p>
                     <div class="social-links">
                         <a href="#" class="social-link" title="Instagram">
                             <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
@@ -351,7 +351,7 @@
                 </div>
                 
                 <div class="footer-section">
-                    <h3>Yhteystiedot</h3>
+                    <h3 data-i18n="footerContact">Yhteystiedot</h3>
                     <div class="contact-info">
                         <p>📍 mellunmäki 22, Helsinki</p>
                         <p>📞 <a href="tel:+358123456789">+358 4056478</a></p>
@@ -360,28 +360,26 @@
                 </div>
                 
                 <div class="footer-section">
-                    <h3>Aukioloajat</h3>
+                    <h3 data-i18n="footerOpeningHours">Aukioloajat</h3>
                     <div class="opening-hours">
                         <p><strong>Ma-Pe:</strong> 10:00 - 22:00</p>
                         <p><strong>La:</strong> 11:00 - 23:00</p>
                         <p><strong>Su:</strong> 12:00 - 21:00</p>
                     </div>
-                    <button class="btn secondary" id="directionsBtn">
+                    <button class="btn secondary" id="directionsBtn" data-i18n="directions">
                         🗺️ Reittiohjeet
                     </button>
                 </div>
                 
                 <div class="footer-section">
-                    <h3>Pikakäyttö</h3>
-                    <a href="views/admin.html" class="btn admin-btn">
-                        ⚡ Admin-kirjautuminen
-                    </a>
+                    <h3 data-i18n="quickAccess">Pikakäyttö</h3>
+                    <a href="views/admin.html" class="btn admin-btn" data-i18n="adminLogin">⚡ Admin-kirjautuminen</a>
                 </div>
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; 2025 Apricus. Kaikki oikeudet pidätetään.</p>
-                <p>Suunniteltu ja toteutettu ❤️:lla</p>
+                <p data-i18n="copyright">&copy; 2025 Apricus. Kaikki oikeudet pidätetään.</p>
+                <p data-i18n="designed">Suunniteltu ja toteutettu ❤️:lla</p>
             </div>
         </div>
     </footer>
@@ -392,7 +390,7 @@
     <!-- Loading indicator -->
     <div class="loading-indicator" id="loadingIndicator">
         <div class="spinner large"></div>
-        <p>Ladataan...</p>
+        <p data-i18n="loading">Ladataan...</p>
     </div>
 
     <!-- Scripts -->

@@ -18,16 +18,16 @@
 </head>
 <body>http://localhost:PORT/frontend/views/admin.html
     <header>
-        <h1 style="text-align:center">Tilausten hallinta</h1>
+        <h1 style="text-align:center" data-i18n="ordersManagement">Tilausten hallinta</h1>
         <nav style="text-align:center; margin-bottom:24px;">
-            <a href="admin.html">Pääsivu</a> |
-            <a href="admin-orders.html" class="active">Tilausten hallinta</a> |
-            <a href="../index.html">Etusivu</a>
+            <a href="admin.html" data-i18n="adminMain">Pääsivu</a> |
+            <a href="admin-orders.html" class="active" data-i18n="ordersManagement">Tilausten hallinta</a> |
+            <a href="../index.html" data-i18n="home">Etusivu</a>
         </nav>
     </header>
     <main>
         <div class="orders-container" id="orders">
-            <p>Ladataan tilauksia...</p>
+            <p data-i18n="loadingOrders">Ladataan tilauksia...</p>
         </div>
     </main>
     <script src="../js/admin-orders.js"></script>
