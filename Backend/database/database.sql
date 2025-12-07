@@ -16,6 +16,9 @@ DROP DATABASE IF EXISTS web_ravintola;
 CREATE DATABASE web_ravintola;تر
 USE web_ravintola;
 
+-- Ensure description_en exists in recipes table
+ALTER TABLE recipes ADD COLUMN IF NOT EXISTS description_en TEXT AFTER description;
+
 
 -- --------------
 CREATE TABLE users (
@@ -58,6 +61,7 @@ CREATE TABLE recipes (
     recipe_name VARCHAR(200) NOT NULL,
     recipe_name_en VARCHAR(200) NOT NULL,
     description TEXT,
+    description_en TEXT,
     price DECIMAL(10, 2) NOT NULL,
     image_url VARCHAR(500),
     preparation_time INT DEFAULT 0 COMMENT 'Time in minutes',
@@ -244,17 +248,17 @@ INSERT INTO ingredients (ingredient_name, ingredient_name_en, unit, stock_quanti
 -- ----------------------------------------------------------------------------
 -- INSERT: Recipes
 -- ----------------------------------------------------------------------------
-INSERT INTO recipes (category_id, recipe_name, recipe_name_en, description, price, image_url, preparation_time, average_rating, total_reviews) VALUES
-(1, 'Fattoush-salaatti', 'Fattoush Salad', 'Tuore fattoush-salaatti rapeiden vihannesten ja paahdetun leivän kanssa', 25.00, 'assets/img/Fattoush-salaatti.jpg', 15, 4.50, 12),
-(2, 'Grillattu lihakebab', 'Grilled Meat Kebab', 'Hiilillä grillattu lihakebab riisin ja salaatin kanssa', 45.00, 'assets/img/Grillattu lihakebab.jpg', 30, 4.80, 24),
-(3, 'Muhallabia', 'Muhallabia', 'Kermainen muhallabia pähkinöiden ja kanelin kanssa', 15.00, 'assets/img/Muhallabia.png', 20, 4.30, 8),
-(1, 'Hummus tahinin kanssa', 'Hummus with Tahini', 'Kermainen tuore hummus tahinin, oliiviöljyn ja pähkinöiden kanssa', 18.00, 'assets/img/hummus.jpg', 15, 4.60, 16),
-(5, 'Minttutee', 'Mint Black Tea', 'Perinteinen musta tee tuoreen mintun ja sokerin kanssa', 8.00, 'assets/img/mint-tea.jpg', 5, 4.40, 10),
-(5, 'Arabialainen kahvi', 'Arabic Coffee', 'Aito arabialainen kahvi kardemumman ja sahramilla', 12.00, 'assets/img/arabic-coffee.jpg', 10, 4.70, 15),
-(1, 'Linssisoppa', 'Lentil Soup', 'Perinteinen linssisoppa vihannesten ja arabialaisien mausteiden kanssa', 22.00, 'assets/img/lentil-soup.jpg', 25, 4.40, 9),
-(5, 'Hibiskustee', 'Hibiscus Tea', 'Virkistävä hibiskusjuoma kylmänä tai kuumana mintun kanssa', 10.00, 'assets/img/hibiscus-tea.jpg', 8, 4.20, 6),
-(2, 'Shawarma-lautanen', 'Shawarma Plate', 'Mausteinen shawarma-liha riisin, salaatin ja tahini-kastikkeen kanssa', 38.00, 'assets/img/shawarma.jpg', 25, 4.75, 20),
-(3, 'Baklava', 'Baklava', 'Perinteinen arabialainen baklava hunajalla ja pähkinöillä', 18.00, 'assets/img/baklava.jpg', 45, 4.90, 18);
+INSERT INTO recipes (category_id, recipe_name, recipe_name_en, description, description_en, price, image_url, preparation_time, average_rating, total_reviews) VALUES
+(1, 'Fattoush-salaatti', 'Fattoush Salad', 'Tuore fattoush-salaatti rapeiden vihannesten ja paahdetun leivän kanssa', 'Fresh fattoush salad with crispy vegetables and toasted bread', 25.00, 'assets/img/Fattoush-salaatti.jpg', 15, 4.50, 12),
+(2, 'Grillattu lihakebab', 'Grilled Meat Kebab', 'Hiilillä grillattu lihakebab riisin ja salaatin kanssa', 'Charcoal-grilled meat kebab with rice and salad', 45.00, 'assets/img/Grillattu lihakebab.jpg', 30, 4.80, 24),
+(3, 'Muhallabia', 'Muhallabia', 'Kermainen muhallabia pähkinöiden ja kanelin kanssa', 'Creamy muhallabia with nuts and cinnamon', 15.00, 'assets/img/Muhallabia.png', 20, 4.30, 8),
+(1, 'Hummus tahinin kanssa', 'Hummus with Tahini', 'Kermainen tuore hummus tahinin, oliiviöljyn ja pähkinöiden kanssa', 'Creamy fresh hummus with tahini, olive oil, and nuts', 18.00, 'assets/img/hummus.jpg', 15, 4.60, 16),
+(5, 'Minttutee', 'Mint Black Tea', 'Perinteinen musta tee tuoreen mintun ja sokerin kanssa', 'Traditional black tea with fresh mint and sugar', 8.00, 'assets/img/mint-tea.jpg', 5, 4.40, 10),
+(5, 'Arabialainen kahvi', 'Arabic Coffee', 'Aito arabialainen kahvi kardemumman ja sahramilla', 'Authentic Arabic coffee with cardamom and saffron', 12.00, 'assets/img/arabic-coffee.jpg', 10, 4.70, 15),
+(1, 'Linssisoppa', 'Lentil Soup', 'Perinteinen linssisoppa vihannesten ja arabialaisien mausteiden kanssa', 'Traditional lentil soup with vegetables and Arabic spices', 22.00, 'assets/img/lentil-soup.jpg', 25, 4.40, 9),
+(5, 'Hibiskustee', 'Hibiscus Tea', 'Virkistävä hibiskusjuoma kylmänä tai kuumana mintun kanssa', 'Refreshing hibiscus drink served cold or hot with mint', 10.00, 'assets/img/hibiscus-tea.jpg', 8, 4.20, 6),
+(2, 'Shawarma-lautanen', 'Shawarma Plate', 'Mausteinen shawarma-liha riisin, salaatin ja tahini-kastikkeen kanssa', 'Spicy shawarma meat with rice, salad, and tahini sauce', 38.00, 'assets/img/shawarma.jpg', 25, 4.75, 20),
+(3, 'Baklava', 'Baklava', 'Perinteinen arabialainen baklava hunajalla ja pähkinöillä', 'Traditional Arabic baklava with honey and nuts', 18.00, 'assets/img/baklava.jpg', 45, 4.90, 18);
 
 
 -- ----------------------------------------------------------------------------
@@ -569,10 +573,11 @@ LIMIT 10;
 
 
 -- ----------------------------------------------------------------------------
-INSERT INTO recipes (category_id, recipe_name, recipe_name_en, description, price, image_url, preparation_time)
+INSERT INTO recipes (category_id, recipe_name, recipe_name_en, description, description_en, price, image_url, preparation_time)
 VALUES (2, 'Falafel-lautanen', 'Falafel Plate', 
-        'Rapeat falafel-pallot humuksen, tahini-kastikkeen ja salaatin kanssa', 
-        32.00, '/assets/img/falafel.jpg', 20);
+    'Rapeat falafel-pallot humuksen, tahini-kastikkeen ja salaatin kanssa', 
+    'Crispy falafel balls with hummus, tahini sauce, and salad', 
+    32.00, '/assets/img/falafel.jpg', 20);
 
 -- Then add ingredients for the new recipe
 INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit)

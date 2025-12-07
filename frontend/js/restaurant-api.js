@@ -171,20 +171,13 @@ class RestaurantAPI {
   // === API للقائمة ===
   async fetchTodayMenu(params = {}) {
     const qs = new URLSearchParams(params).toString();
-    const endpoint = `/menu/today${qs ? ('?' + qs) : ''}`;
+    const endpoint = `/menu/recipes${qs ? ('?' + qs) : ''}`;
     const response = await this.get(endpoint);
-    
-    // Extract menu data and convert to array format expected by frontend
-    if (response && response.data && response.data.menu) {
-      const menuArray = [];
-      Object.values(response.data.menu).forEach(categoryData => {
-        if (categoryData.recipes) {
-          menuArray.push(...categoryData.recipes);
-        }
-      });
-      return menuArray;
+
+    // Backend now returns an array of recipes directly
+    if (response && response.data && Array.isArray(response.data)) {
+      return response.data;
     }
-    
     return [];
   }
 

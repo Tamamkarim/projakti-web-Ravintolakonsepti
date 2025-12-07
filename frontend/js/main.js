@@ -503,12 +503,22 @@ function initializeModernApp() {
             if (loadingElement) {
                 loadingElement.style.display = 'block';
             }
-            
-            const menuData = await fetchTodayMenu();
+            // امسح القائمة القديمة قبل تحميل الجديدة
+            appState.menu = [];
+            appState.filteredMenu = [];
+            renderMenu();
+
+            // احصل على اللغة المختارة من القائمة
+            let lang = 'fi';
+            const langSelect = document.getElementById('langSelect');
+            if (langSelect && langSelect.value) {
+                lang = langSelect.value;
+            }
+            const menuData = await fetchTodayMenu({ lang });
             console.log('📋 Ruokalista ladattu:', menuData.length, 'tuotetta');
-            
+
+            // بناء عناصر القائمة فقط من الحقول الصحيحة حسب اللغة
             appState.menu = menuData.map(item => {
-                // Process ingredients - convert from MySQL format to array of strings
                 let ingredients = [];
                 if (Array.isArray(item.ingredients)) {
                     ingredients = item.ingredients.map(ing => {
@@ -518,17 +528,13 @@ function initializeModernApp() {
                         return String(ing);
                     });
                 }
-                
                 return {
                     ...item,
-                    // Map MySQL database fields to frontend format
-                    id: item.recipe_id || item.id,
-                    name: item.recipe_name || item.name_fi || item.name,
-                    nameEn: item.recipe_name_en || item.name_en || item.name,
-                    description: item.description || item.description_fi || '',
+                    id: item.id || item.recipe_id,
+                    name: lang === 'en' ? (item.nameEn || item.name_en || item.recipe_name_en || item.name) : (item.name || item.recipe_name),
+                    description: lang === 'en' ? (item.descriptionEn || item.description_en || item.description) : (item.description || item.description_fi || ''),
                     price: parseFloat(item.price) || 0,
                     image: (item.image_url ? item.image_url.split('/').pop() : (item.image ? item.image.split('/').pop() : 'placeholder.jpg')),
-                    // Add default values
                     category: item.category_id || item.category || 'mains',
                     vegan: item.vegan || false,
                     vegetarian: item.vegetarian || false,
@@ -538,10 +544,10 @@ function initializeModernApp() {
                     ingredients: ingredients
                 };
             });
-            
+
             appState.filteredMenu = appState.menu;
             renderMenu();
-            
+
         } catch (error) {
             console.error('❌ Virhe ruokalistan lataamisessa:', error);
             showNotification('Ruokalistan lataus epäonnistui', 'error');
@@ -580,17 +586,33 @@ function initializeModernApp() {
             return;
         }
         
-        menuGrid.innerHTML = appState.filteredMenu.map(item => `
+        // Get current language and translations
+        let lang = 'fi';
+        const langSelect = document.getElementById('langSelect');
+        if (langSelect && langSelect.value) {
+            lang = langSelect.value;
+        }
+        const t = (key) => (window.translations && window.translations[lang] && window.translations[lang][key]) ? window.translations[lang][key] : key;
+
+        menuGrid.innerHTML = appState.filteredMenu.map(item => {
+            // اختر الاسم والوصف الصحيحين حسب اللغة المختارة دائماً
+            const itemName = lang === 'en'
+                ? (item.nameEn || item.name_en || item.recipe_name_en || item.name)
+                : (item.name || item.recipe_name);
+            const itemDescription = lang === 'en'
+                ? (item.descriptionEn || item.description_en || item.description)
+                : (item.description || item.description_fi || '');
+            return `
               <div class="menu-item" data-id="${item.id}">
                  <img src="${item.image_url || item.image || 'assets/img/placeholder.jpg'}" 
-                     alt="${escapeHtml(item.name)}" 
+                     alt="${escapeHtml(itemName)}" 
                      class="menu-item-image"
                      onerror="this.src='assets/img/placeholder.jpg'">
                 
                  <div class="menu-item-content">
                     <div class="menu-item-header">
                         <div>
-                            <h3 class="menu-item-title">${escapeHtml(item.name)}</h3>
+                            <h3 class="menu-item-title">${escapeHtml(itemName)}</h3>
                             <div class="menu-item-price">${parseFloat(item.price || 0).toFixed(2)} €</div>
                         </div>
                         <button class="favorite-btn ${appState.favorites.includes(item.id) ? 'active' : ''}" 
@@ -600,26 +622,27 @@ function initializeModernApp() {
                         </button>
                     </div>
                     
-                    <p class="menu-item-description">${escapeHtml(item.description)}</p>
+                    <p class="menu-item-description">${escapeHtml(itemDescription)}</p>
                     
                     <div class="menu-item-tags">
-                        ${item.vegan ? '<span class="menu-tag vegan">🌱 Vegaani</span>' : ''}
-                        ${item.vegetarian ? '<span class="menu-tag vegetarian">🥬 Kasvis</span>' : ''}
-                        ${item.glutenFree ? '<span class="menu-tag gluten-free">🌾 Gluteeniton</span>' : ''}
-                        ${item.lactoseFree ? '<span class="menu-tag lactose-free">🥛 Laktoositon</span>' : ''}
+                        ${item.vegan ? '<span class="menu-tag vegan">🌱 ' + t('vegan') + '</span>' : ''}
+                        ${item.vegetarian ? '<span class="menu-tag vegetarian">🥬 ' + t('vegetarian') + '</span>' : ''}
+                        ${item.glutenFree ? '<span class="menu-tag gluten-free">🌾 ' + t('glutenFree') + '</span>' : ''}
+                        ${item.lactoseFree ? '<span class="menu-tag lactose-free">🥛 ' + t('lactoseFree') + '</span>' : ''}
                     </div>
                     
                     <div class="menu-item-actions">
                         <button class="btn secondary" onclick="showItemDetails('${item.id}')">
-                            Näytä tiedot
+                            ${t('showDetails')}
                         </button>
                         <button class="btn primary" onclick="addToCartFromMenu('${item.id}')">
-                            Lisää koriin
+                            ${t('addToCart')}
                         </button>
                     </div>
                 </div>
             </div>
-        `).join('');
+        `;
+        }).join('');
     }
 
     // Cart functionality
@@ -647,9 +670,7 @@ function initializeModernApp() {
             checkoutBtn.addEventListener('click', handleCheckout);
         }
         
-        // إزالة إغلاق السلة عند الضغط على overlay
-        // السلة تُغلق فقط بزر X
-        // document.getElementById('overlay').addEventListener('click', closeCart);
+        
     }
 
     function closeCart() {
@@ -1056,20 +1077,30 @@ function initializeModernApp() {
     window.showItemDetails = function(itemId) {
         const item = appState.menu.find(m => m.id == itemId);
         if (!item) return;
-        
+
+        // Get current language
+        let lang = 'fi';
+        const langSelect = document.getElementById('langSelect');
+        if (langSelect && langSelect.value) {
+            lang = langSelect.value;
+        }
+        // Pick correct name/description for modal
+        const name = lang === 'en' ? (item.nameEn || item.name_en || item.name) : (item.name || item.recipe_name);
+        const description = lang === 'en' ? (item.descriptionEn || item.description_en || item.description) : (item.description || item.description_fi || '');
+
         // Create modal for item details
         const modal = document.createElement('div');
         modal.className = 'item-detail-modal';
         modal.innerHTML = `
             <div class="modal-content">
                 <div class="modal-header">
-                    <h2>${escapeHtml(item.name)}</h2>
+                    <h2>${escapeHtml(name)}</h2>
                     <button class="close-btn" onclick="this.closest('.item-detail-modal').remove()">×</button>
                 </div>
                 <div class="modal-body">
-                    <img src="${item.image || 'assets/img/placeholder.jpg'}" alt="${escapeHtml(item.name)}" class="item-detail-image">
+                    <img src="${item.image || 'assets/img/placeholder.jpg'}" alt="${escapeHtml(name)}" class="item-detail-image">
                     <div class="item-detail-info">
-                        <p class="item-description">${escapeHtml(item.description)}</p>
+                        <p class="item-description">${escapeHtml(description)}</p>
                         <div class="item-price">${parseFloat(item.price || 0).toFixed(2)} €</div>
                         <div class="item-tags">
                             ${item.vegan ? '<span class="tag vegan">🌱 Vegaani</span>' : ''}

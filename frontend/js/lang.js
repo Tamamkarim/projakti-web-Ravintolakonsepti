@@ -345,8 +345,14 @@ document.addEventListener('DOMContentLoaded', function() {
   if (langSelect) {
     langSelect.addEventListener('change', function() {
       updateLanguage(langSelect.value);
+      if (typeof window.loadMenuData === 'function') {
+        window.loadMenuData();
+      }
     });
     // Set initial language
     updateLanguage(langSelect.value);
+    if (typeof window.loadMenuData === 'function') {
+      window.loadMenuData();
+    }
   }
 });

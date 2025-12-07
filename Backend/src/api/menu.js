@@ -84,35 +84,50 @@ router.get('/categories/:id/recipes', async (req, res) => {
 // Hae kaikki reseptit
 router.get('/recipes', async (req, res) => {
 	try {
-		const { category, available, search } = req.query;
+		const { category, available, search, lang } = req.query;
 		let recipes = await db.getAllRecipes();
-    
+
 		// تصفية حسب الفئة
 		if (category) {
 			recipes = recipes.filter(recipe => recipe.category_id == category);
 		}
-    
+
 		// تصفية حسب التوفر
 		if (available !== undefined) {
 			const isAvailable = available === 'true';
 			recipes = recipes.filter(recipe => recipe.is_available === isAvailable);
 		}
-    
+
 		// البحث في الاسم والوصف
 		if (search) {
 			const searchTerm = search.toLowerCase();
 			recipes = recipes.filter(recipe => 
 				recipe.recipe_name.toLowerCase().includes(searchTerm) ||
-				recipe.recipe_name_en.toLowerCase().includes(searchTerm) ||
+				(recipe.recipe_name_en && recipe.recipe_name_en.toLowerCase().includes(searchTerm)) ||
 				(recipe.description && recipe.description.toLowerCase().includes(searchTerm))
 			);
 		}
-    
+
+		// تجهيز البيانات حسب اللغة
+		const selectedLang = (lang && lang.toLowerCase() === 'en') ? 'en' : 'fi';
+		const mappedRecipes = recipes.map(recipe => ({
+			id: recipe.recipe_id,
+			name: selectedLang === 'en' ? (recipe.recipe_name_en || recipe.recipe_name) : recipe.recipe_name,
+			description: selectedLang === 'en' ? (recipe.description_en || recipe.description) : recipe.description,
+			price: recipe.price,
+			image_url: recipe.image_url,
+			preparation_time: recipe.preparation_time,
+			is_available: recipe.is_available,
+			average_rating: recipe.average_rating,
+			total_reviews: recipe.total_reviews,
+			category_id: recipe.category_id
+		}));
+
 		res.json({
 			success: true,
-			data: recipes,
-			count: recipes.length,
-			filters: { category, available, search }
+			data: mappedRecipes,
+			count: mappedRecipes.length,
+			filters: { category, available, search, lang: selectedLang }
 		});
 	} catch (error) {
 		console.error('خطأ في جلب الوصفات:', error);
@@ -129,40 +144,57 @@ router.get('/recipes/:id', async (req, res) => {
 		const { id } = req.params;
 		const recipe = await db.getRecipeById(id);
     
-		if (!recipe) {
-			return res.status(404).json({
+		try {
+			const { category, available, search, lang } = req.query;
+			let recipes = await db.getAllRecipes();
+
+			// تصفية حسب الفئة
+			if (category) {
+				recipes = recipes.filter(recipe => recipe.category_id == category);
+			}
+			// تصفية حسب التوفر
+			if (available !== undefined) {
+				const isAvailable = available === 'true';
+				recipes = recipes.filter(recipe => recipe.is_available === isAvailable);
+			}
+			// البحث في الاسم والوصف
+			if (search) {
+				const searchTerm = search.toLowerCase();
+				recipes = recipes.filter(recipe => 
+					recipe.recipe_name.toLowerCase().includes(searchTerm) ||
+					recipe.recipe_name_en.toLowerCase().includes(searchTerm) ||
+					(recipe.description && recipe.description.toLowerCase().includes(searchTerm))
+				);
+			}
+
+			// تجهيز البيانات حسب اللغة
+			const selectedLang = (lang && lang.toLowerCase() === 'en') ? 'en' : 'fi';
+			const mappedRecipes = recipes.map(recipe => ({
+				id: recipe.recipe_id,
+				name: selectedLang === 'en' ? recipe.recipe_name_en : recipe.recipe_name,
+				description: selectedLang === 'en' ? recipe.description_en : recipe.description,
+				price: recipe.price,
+				image_url: recipe.image_url,
+				preparation_time: recipe.preparation_time,
+				is_available: recipe.is_available,
+				average_rating: recipe.average_rating,
+				total_reviews: recipe.total_reviews,
+				category_id: recipe.category_id
+			}));
+
+			res.json({
+				success: true,
+				data: mappedRecipes,
+				count: mappedRecipes.length,
+				filters: { category, available, search, lang: selectedLang }
+			});
+		} catch (error) {
+			console.error('خطأ في جلب الوصفات:', error);
+			res.status(500).json({
 				success: false,
-				error: 'الوصفة غير موجودة'
+				error: 'خطأ في جلب الوصفات'
 			});
 		}
-    
-		// Get ingredients for the recipe
-		const ingredients = await db.getRecipeIngredients(id);
-		recipe.ingredients = ingredients;
-    
-		res.json({
-			success: true,
-			data: recipe
-		});
-	} catch (error) {
-		console.error('خطأ في جلب الوصفة:', error);
-		res.status(500).json({
-			success: false,
-			error: 'خطأ في جلب الوصفة'
-		});
-	}
-});
-
-// قائمة اليوم (وصفات مميزة)
-router.get('/today', async (req, res) => {
-	try {
-		const allRecipes = await db.getAllRecipes();
-		const availableRecipes = allRecipes.filter(recipe => recipe.is_available !== false);
-    
-		console.log('📦 Kaikki reseptit:', allRecipes.length);
-		console.log('📦 Saatavilla olevat reseptit:', availableRecipes.length);
-    
-		// Ryhmittele reseptit kategorian mukaan
 		const menuByCategory = {};
 		const categories = await db.getAllCategories();
     
