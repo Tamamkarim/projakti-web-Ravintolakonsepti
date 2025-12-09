@@ -829,12 +829,14 @@ function initializeModernApp() {
             favoritesList.innerHTML = appState.favorites.map(itemId => {
                 const item = appState.menu.find(m => m.id == itemId);
                 if (!item) return '';
-                
+                // استخدم image_url أو image أو صورة افتراضية
+                const imageSrc = item.image_url || item.image || 'assets/img/placeholder.jpg';
                 return `
                     <div class="favorite-item">
-                        <img src="${item.image || 'assets/img/placeholder.jpg'}" 
+                        <img src="${imageSrc}" 
                              alt="${escapeHtml(item.name)}" 
-                             class="favorite-item-image">
+                             class="favorite-item-image"
+                             onerror="this.onerror=null;this.src='assets/img/placeholder.jpg';">
                         <div class="favorite-item-details">
                             <h4>${escapeHtml(item.name)}</h4>
                             <p class="favorite-item-price">${parseFloat(item.price || 0).toFixed(2)} €</p>
@@ -1098,7 +1100,7 @@ function initializeModernApp() {
                     <button class="close-btn" onclick="this.closest('.item-detail-modal').remove()">×</button>
                 </div>
                 <div class="modal-body">
-                    <img src="${item.image || 'assets/img/placeholder.jpg'}" alt="${escapeHtml(name)}" class="item-detail-image">
+                    <img src="${!item.image ? 'assets/img/placeholder.jpg' : (item.image.startsWith('assets/img/') ? item.image : 'assets/img/' + item.image)}" alt="${escapeHtml(name)}" class="item-detail-image">
                     <div class="item-detail-info">
                         <p class="item-description">${escapeHtml(description)}</p>
                         <div class="item-price">${parseFloat(item.price || 0).toFixed(2)} €</div>

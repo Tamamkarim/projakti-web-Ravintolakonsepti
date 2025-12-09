@@ -1,3 +1,29 @@
+.btn-close-order {
+    background: #fff;
+    color: #e74c3c !important;
+    border: 2px solid #e0e0e0;
+    font-size: 2.2rem;
+    cursor: pointer;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    box-shadow: 0 4px 24px #e74c3c55;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: box-shadow 0.2s, transform 0.2s, background 0.2s;
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 10;
+}
+.btn-close-order:hover {
+    background: #e74c3c;
+    color: #fff !important;
+    box-shadow: 0 8px 32px #e74c3c99;
+    border: 2px solid #e74c3c;
+    transform: scale(1.18);
+}
 body.admin-body {
     font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
     background: #f4f6fb;
@@ -78,6 +104,34 @@ label {
   border-radius: 12px;
   padding: 0.8rem 2rem;
   box-shadow: 0 4px 16px rgba(162,89,198,0.15);
+}
+
+/* زر خروج الطلبات بارز */
+.btn-close-order {
+    background: #fff;
+    color: #e74c3c !important;
+    border: none;
+    font-size: 2.2rem;
+    cursor: pointer;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    box-shadow: 0 2px 12px #e74c3c33;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: box-shadow 0.2s, transform 0.2s;
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 10;
+}
+.btn-close-order:hover {
+    background: #e74c3c;
+    color: #fff !important;
+    box-shadow: 0 4px 24px #e74c3c66;
+    transform: scale(1.15);
+}
   cursor: pointer;
   transition: background 0.3s, transform 0.2s;
   display: flex;

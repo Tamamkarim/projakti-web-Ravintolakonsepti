@@ -7,8 +7,8 @@ const orders = [
       name: "tamam"
     },
     items: [
-      { name: "بيتزا", quantity: 2 },
-      { name: "عصير", quantity: 1 }
+      { name: "بيتزا", quantity: 2, image_url: "Fattoush-salaatti.jpg" },
+      { name: "عصير", quantity: 1, image_url: "juice.jpg" }
     ],
     total: 50,
     date: "2025-12-05"
