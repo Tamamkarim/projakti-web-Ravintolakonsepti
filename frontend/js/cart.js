@@ -1,6 +1,5 @@
 // Tee funktiot saataville window-oliolla
 // مسح السلة تلقائياً عند بداية التطبيق
-localStorage.removeItem('rm_cart_v1');
 window.loadCart = loadCart;
 window.addToCart = addToCart;
 window.removeFromCart = removeFromCart;

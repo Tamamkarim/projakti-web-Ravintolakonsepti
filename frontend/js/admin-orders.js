@@ -21,7 +21,7 @@ fetch('/api/orders')
                 if (!imgSrc) imgSrc = 'assets/img/placeholder.jpg';
                 else if (!imgSrc.startsWith('assets/img/')) imgSrc = 'assets/img/' + imgSrc;
                 return `<li class="order-item">
-                  <img src="${imgSrc}" alt="${item.name}" style="width:40px;height:40px;object-fit:cover;margin-right:8px;vertical-align:middle;" onerror="this.onerror=null;this.src='assets/img/placeholder.jpg';">
+                  <img src="${imgSrc}" alt="${item.name}" style="width:40px;height:40px;object-fit:cover;margin-right:8px;vertical-align:middle;" onerror="this.onerror=null;this.src='/assets/img/placeholder.jpg';">
                   ${item.name} × ${item.quantity}
                 </li>`;
               }).join('')}

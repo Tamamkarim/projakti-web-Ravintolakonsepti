@@ -38,7 +38,7 @@ h1, h2, h3, h4 {
     color: #e1701a;
     margin-bottom: 1rem;
 }
-
+/* Removed erroneous colon */
 label {
     font-weight: 500;
     color: #495057;
@@ -132,12 +132,7 @@ label {
     box-shadow: 0 4px 24px #e74c3c66;
     transform: scale(1.15);
 }
-  cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
+/* Removed invalid lines */
 .admin-login-btn:hover {
   background: linear-gradient(90deg, #e1701a 0%, #a259c6 100%);
   transform: translateY(-2px) scale(1.04);
@@ -148,10 +143,73 @@ label {
 
 .admin-header {
     background: linear-gradient(135deg, #c0392b, #e1701a);
-    color: white;
-    padding: 1rem 2rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
+
+/* تصغير حجم صورة الطبق في جدول إدارة الطعام */
+.menu-table-img {
+    max-width: 300px;
+    height: auto;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(162,89,198,0.10);
+    margin: 0 auto;
+    display: block;
+}
+
+/* تنسيق جدول إدارة الطعام */
+.menu-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(162,89,198,0.08);
+}
+.menu-table th, .menu-table td {
+    padding: 1rem 0.5rem;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    font-size: 1rem;
+}
+.menu-table th {
+    background: #f4f6fb;
+    color: #e1701a;
+    font-weight: 700;
+}
+.menu-table tr:last-child td {
+    border-bottom: none;
+}
+.menu-table-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+.menu-table .btn-edit {
+    background: #a259c6;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.4rem 1.2rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.menu-table .btn-edit:hover {
+    background: #e1701a;
+}
+.menu-table .btn-delete {
+    background: #e74c3c;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.4rem 1.2rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.menu-table .btn-delete:hover {
+    background: #c0392b;
+}
+    /* Removed invalid lines */
 
 .admin-nav {
     display: flex;

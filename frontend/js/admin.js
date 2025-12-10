@@ -173,7 +173,7 @@ class AdminPanel {
     
     // الانتقال إلى الصفحة الرئيسية مع الحفاظ على حالة تسجيل الدخول
     setTimeout(() => {
-      window.location.href = './index.html';
+      window.location.href = '/index.html';
     }, 300);
   }
 
@@ -694,6 +694,10 @@ class AdminPanel {
   }
 
   async deleteRecipe(recipeId) {
+    if (!recipeId || recipeId === 'undefined') {
+      notifications.error('Virhe: ruokalajin tunniste puuttuu!');
+      return;
+    }
     if (!confirm('Oletko varma, että haluat poistaa tämän ruokalajin?')) return;
 
     try {

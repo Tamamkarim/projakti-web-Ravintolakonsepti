@@ -13,9 +13,9 @@ UPDATE recipes SET image_url = 'assets/img/Falafel-lautanen.jpg' WHERE recipe_na
 
 -- Create the database if it doesn't exist
 DROP DATABASE IF EXISTS web_ravintola;
-CREATE DATABASE web_ravintola;تر
+CREATE DATABASE web_ravintola;
 USE web_ravintola;
-
+    
 -- Ensure description_en exists in recipes table
 ALTER TABLE recipes ADD COLUMN IF NOT EXISTS description_en TEXT AFTER description;
 

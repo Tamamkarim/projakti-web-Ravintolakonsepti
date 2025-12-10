@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="fi" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Paneeli - Ravintolakonsepti</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="icon" type="image/png" href="assets/img/logo.png">
+</head>
+<body class="admin-body">
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" data-i18n="loading">Ladataan...</div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal-overlay" style="display: flex;">
+        <div class="modal-content login-modal">
+            <h2 data-i18n="loginAdmin">Kirjaudu hallintapaneeliin</h2>
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label for="adminEmail" data-i18n="emailLabel">Sähköposti:</label>
+                    <input type="email" id="adminEmail" value="admin@restaurant.com" required class="admin-input">
+                </div>
+                <div class="form-group">
+                    <label for="adminPassword" data-i18n="passwordLabel">Salasana:</label>
+                    <input type="password" id="adminPassword" value="admin123" required class="admin-input">
+                </div>
+                <button type="submit" class="admin-login-btn" data-i18n="adminLogin">⚡ Admin-kirjautuminen</button>
+            </form>
+        </div>
+    </div>
+
+    <header class="admin-header">
+        <div class="admin-nav">
+            <img src="assets/img/logo.png" alt="Logo" class="admin-logo">
+            <h1 data-i18n="adminPanel">Hallintapaneeli</h1>
+            <div class="admin-user">
+                <span id="adminUserName" data-i18n="adminUser">Admin</span>
+                <button id="btnBackToMain" class="btn primary" style="margin-left: 10px;" data-i18n="backToMain">🏠 Takaisin etusivulle</button>
+                <button id="btnAdminLogout" class="btn secondary" data-i18n="logout">Kirjaudu ulos</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="admin-main">
+        <nav class="admin-sidebar">
+            <ul class="admin-menu">
+                <li><a href="#" id="btnBackToMainSidebar" class="admin-menu-link" style="border-bottom: 1px solid #ddd; margin-bottom: 10px; padding-bottom: 10px;">
+                    <span class="menu-icon">🏠</span> <span data-i18n="backToMain">Takaisin etusivulle</span>
+                </a></li>
+                <li><a href="#dashboard" class="admin-menu-link active" data-section="dashboard">
+                    <span class="menu-icon">📊</span> <span data-i18n="dashboard">Kojelauta</span>
+                </a></li>
+                <li><a href="#menu-management" class="admin-menu-link" data-section="menu-management">
+                    <span class="menu-icon">🍽️</span> <span data-i18n="menuManagement">Ruokalistan hallinta</span>
+                </a></li>
+                <li><a href="#orders" class="admin-menu-link" data-section="orders">
+                    <span class="menu-icon">📋</span> <span data-i18n="orders">Tilaukset</span>
+                </a></li>
+                <li><a href="#categories" class="admin-menu-link" data-section="categories">
+                    <span class="menu-icon">📁</span> <span data-i18n="categories">Kategoriat</span>
+                </a></li>
+                <li><a href="#customers" class="admin-menu-link" data-section="customers">
+                    <span class="menu-icon">👥</span> <span data-i18n="customers">Asiakkaat</span>
+                </a></li>
+                <li><a href="#settings" class="admin-menu-link" data-section="settings">
+                    <span class="menu-icon">⚙️</span> <span data-i18n="settings">Asetukset</span>
+                </a></li>
+            </ul>
+        </nav>
+
+        <div class="admin-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="admin-section active">
+                <div class="section-header">
+                    <h2 data-i18n="dashboard">Kojelauta</h2>
+                    <button id="btnRefreshStats" class="btn secondary" data-i18n="refreshStats">Päivitä tilastot</button>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-content">
+                            <h3 id="totalOrders">0</h3>
+                            <p data-i18n="totalOrders">Tilauksia yhteensä</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-content">
+                            <h3 id="totalRevenue">0 €</h3>
+                            <p data-i18n="totalRevenue">Kokonaistulot</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🍽️</div>
+                        <div class="stat-content">
+                            <h3 id="totalRecipes">0</h3>
+                            <p data-i18n="totalRecipes">Ruokalajeja</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-content">
+                            <h3 id="totalUsers">0</h3>
+                            <p data-i18n="totalUsers">Rekisteröityneitä käyttäjiä</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-charts">
+                    <div class="chart-container">
+                        <h3 data-i18n="recentOrders">Viimeisimmät tilaukset</h3>
+                        <div id="recentOrdersList" class="recent-orders"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Menu Management Section -->
+            <section id="menu-management" class="admin-section">
+                <div class="section-header">
+                    <h2 data-i18n="menuManagement">Ruokalistan hallinta</h2>
+                    <button id="btnAddDish" class="btn primary" data-i18n="addDish">Lisää uusi ruokalaji</button>
+                </div>
+
+                <div class="menu-filters">
+                    <input type="text" id="menuSearch" placeholder="Hae ruokalajia..." class="admin-input" data-i18n="searchDish">
+                    <select id="categoryFilter" class="admin-select">
+                        <option value="" data-i18n="allCategories">Kaikki kategoriat</option>
+                    </select>
+                    <select id="availabilityFilter" class="admin-select">
+                        <option value="" data-i18n="all">Kaikki</option>
+                        <option value="true" data-i18n="available">Saatavilla</option>
+                        <option value="false" data-i18n="notAvailable">Ei saatavilla</option>
+                    </select>
+                </div>
+
+                <div class="menu-table-container">
+                    <table class="admin-table" id="menuTable">
+                        <thead>
+                            <tr>
+                                <th data-i18n="image">Kuva</th>
+                                <th data-i18n="name">Nimi</th>
+                                <th data-i18n="category">Kategoria</th>
+                                <th data-i18n="price">Hinta</th>
+                                <th data-i18n="availability">Saatavuus</th>
+                                <th data-i18n="actions">Toiminnot</th>
+                            </tr>
+                        </thead>
+                        <tbody id="menuTableBody">
+                            <!-- Dynamic content -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Orders Section -->
+            <section id="orders" class="admin-section">
+                <div class="section-header">
+                    <h2 data-i18n="ordersManagement">Tilausten hallinta</h2>
+                    <div class="header-actions">
+                        <select id="orderStatusFilter" class="admin-select">
+                            <option value="" data-i18n="allOrders">Kaikki tilaukset</option>
+                            <option value="pending" data-i18n="pending">Odottaa</option>
+                            <option value="confirmed" data-i18n="confirmed">Vahvistettu</option>
+                            <option value="preparing" data-i18n="preparing">Valmistetaan</option>
+                            <option value="ready" data-i18n="ready">Valmis</option>
+                            <option value="delivered" data-i18n="delivered">Toimitettu</option>
+                            <option value="cancelled" data-i18n="cancelled">Peruutettu</option>
+                        </select>
+                        <button id="btnRefreshOrders" class="btn secondary" data-i18n="refresh">Päivitä</button>
+                    </div>
+                </div>
+
+                <div class="orders-container">
+                    <div id="ordersGrid" class="orders-grid">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Categories Section -->
+            <section id="categories" class="admin-section">
+                <div class="section-header">
+                    <h2 data-i18n="categoriesManagement">Kategorioiden hallinta</h2>
+                    <button id="btnAddCategory" class="btn primary" data-i18n="addCategory">Lisää kategoria</button>
+                </div>
+
+                <div class="categories-grid" id="categoriesGrid">
+                    <!-- Dynamic content -->
+                </div>
+            </section>
+
+            <!-- Customers Section -->
+            <section id="customers" class="admin-section">
+                <div class="section-header">
+                    <h2 data-i18n="customersManagement">Asiakkaiden hallinta</h2>
+                </div>
+
+                <div class="customers-table-container">
+                    <table class="admin-table" id="customersTable">
+                        <thead>
+                            <tr>
+                                <th data-i18n="name">Nimi</th>
+                                <th data-i18n="email">Sähköposti</th>
+                                <th data-i18n="registrationDate">Rekisteröitymispäivä</th>
+                                <th data-i18n="ordersCount">Tilausten määrä</th>
+                                <th data-i18n="actions">Toiminnot</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customersTableBody">
+                            <!-- Dynamic content -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings" class="admin-section">
+                <div class="section-header">
+                    <h2 data-i18n="settings">Asetukset</h2>
+                </div>
+
+                <div class="settings-container">
+                    <div class="settings-group">
+                        <h3 data-i18n="restaurantInfo">Ravintolan tiedot</h3>
+                        <form id="restaurantSettingsForm">
+                            <div class="form-group">
+                                <label for="restaurantName" data-i18n="restaurantNameLabel">Ravintolan nimi:</label>
+                                <input type="text" id="restaurantName" value="Mood_Corridor" class="admin-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="restaurantPhone" data-i18n="restaurantPhoneLabel">Puhelinnumero:</label>
+                                <input type="tel" id="restaurantPhone" value="+358 12 345 6789" class="admin-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="restaurantEmail" data-i18n="restaurantEmailLabel">Sähköposti:</label>
+                                <input type="email" id="restaurantEmail" value="info@moodcorridor.fi" class="admin-input">
+                            </div>
+                            <button type="submit" class="btn primary" data-i18n="save">Tallenna</button>
+                        </form>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3 data-i18n="systemSettings">Järjestelmän asetukset</h3>
+                        <div class="setting-item">
+                            <label class="switch">
+                                <input type="checkbox" id="enableNotifications" checked>
+                                <span class="slider"></span>
+                            </label>
+                            <span data-i18n="enableNotifications">Ota käyttöön ilmoitukset</span>
+                        </div>
+                        <div class="setting-item">
+                            <label class="switch">
+                                <input type="checkbox" id="autoRefresh" checked>
+                                <span class="slider"></span>
+                            </label>
+                            <span data-i18n="autoRefresh">Automaattinen päivitys</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Recipe Modal -->
+    <div id="recipeModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content recipe-edit-modal">
+            <button class="modal-close">&times;</button>
+            <h3 id="recipeModalTitle" data-i18n="addDishTitle">Lisää uusi ruokalaji</h3>
+            <form id="recipeForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="recipeName" data-i18n="recipeNameFiLabel">Nimi (suomeksi):</label>
+                        <input type="text" id="recipeName" required class="admin-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="recipeNameEn" data-i18n="recipeNameEnLabel">Nimi (englanniksi):</label>
+                        <input type="text" id="recipeNameEn" class="admin-input">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="recipeDescription" data-i18n="recipeDescriptionLabel">Kuvaus:</label>
+                    <textarea id="recipeDescription" required class="admin-textarea"></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="recipePrice" data-i18n="recipePriceLabel">Hinta (€):</label>
+                        <input type="number" id="recipePrice" step="0.01" min="0" required class="admin-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="recipeCategory" data-i18n="recipeCategoryLabel">Kategoria:</label>
+                        <select id="recipeCategory" required class="admin-select">
+                            <option value="" data-i18n="selectCategory">Valitse kategoria</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="recipePreparationTime" data-i18n="recipePreparationTimeLabel">Valmistusaika (min):</label>
+                        <input type="number" id="recipePreparationTime" min="1" class="admin-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="recipeImage" data-i18n="recipeImageLabel">Kuvan URL:</label>
+                        <input type="url" id="recipeImage" class="admin-input">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="recipeIngredients" data-i18n="recipeIngredientsLabel">Ainesosat (yksi per rivi):</label>
+                    <textarea id="recipeIngredients" class="admin-textarea" placeholder="Esim:&#10;Lohi&#10;Riisi&#10;Soijakastike"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="recipeAvailable" checked>
+                        <span class="checkmark"></span>
+                        <span data-i18n="available">Saatavilla</span>
+                    </label>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn secondary" onclick="closeRecipeModal()" data-i18n="cancel">Peruuta</button>
+                    <button type="submit" class="btn primary" data-i18n="save">Tallenna</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/inert-polyfill.js"></script>
+    <script src="../js/restaurant-api.js"></script>
+    <script src="../js/app-state.js"></script>
+    <script src="../js/notifications.js"></script>
+    <script src="../js/components.js"></script>
+    <script src="../js/admin.js"></script>
+</body>
+</html>

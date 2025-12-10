@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Apricus - Kahvila & Ravintola | Ainutlaatuisia makuelämyksiä</title>
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#c0392b">
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/components.css">
-    <link rel="icon" type="image/png" href="assets/img/logo.png">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="icon" type="image/png" href="/assets/img/logo.png">
     <meta name="description" content="Apricus - Ainutlaatuinen kahvila ja ravintola kokemuksia Suomessa">
-<script src="js/lang.js"></script>
+<script src="/js/lang.js"></script>
 </head>
 <body class="modern-page">
     <!-- Navigation Header -->
@@ -18,7 +18,7 @@
         <div class="header-container">
             <!-- Logo Section -->
             <div class="logo-section">
-                <img src="assets/img/logo.png" alt="Apricus Logo" class="logo">
+                <img src="/assets/img/logo.png" alt="Apricus Logo" class="logo">
                 <span class="brand-text" data-i18n="brand">TK</span>
             </div>
 
@@ -120,7 +120,7 @@
     <!-- Hero Section -->
     <section class="hero-section" id="etusivu">
         <div class="hero-background">
-            <img src="assets/img/Asil.jpg" alt="Apricus ravintola" class="hero-image">
+            <img src="/assets/img/Asil.jpg" alt="Apricus ravintola" class="hero-image">
             <div class="hero-overlay"></div>
         </div>
         <div class="hero-content">
@@ -243,7 +243,7 @@
                         </div>
                     </div>
                     <div class="about-image">
-                        <img src="assets/img/about.jpg" alt="Apricus ravintola sisältä">
+                        <img src="/assets/img/about.jpg" alt="Apricus ravintola sisältä">
                     </div>
                 </div>
             </div>
@@ -270,7 +270,8 @@
         </div>
         <div class="cart-footer">
             <div class="cart-total">
-                <span data-i18n="total">Yhteensä: <strong id="cartTotal">0,00 €</strong></span>
+                <span data-i18n="total">Yhteensä:</span>
+                <span id="cartTotal">0,00 €</span>
             </div>
             <button class="btn primary full-width" id="checkoutBtn" disabled>
                 <span data-i18n="checkout">Siirry kassalle</span>
@@ -373,7 +374,7 @@
                 
                 <div class="footer-section">
                     <h3 data-i18n="quickAccess">Pikakäyttö</h3>
-                    <a href="views/admin.html" class="btn admin-btn" data-i18n="adminLogin">⚡ Admin-kirjautuminen</a>
+                    <button id="quickAdminBtn" class="btn admin-btn" data-i18n="adminLogin">⚡ Admin-kirjautuminen</button>
                 </div>
             </div>
             
@@ -417,13 +418,13 @@
         };
         console.log('💡 لتنظيف السلة، اكتب في Console: resetCart()');
     </script>
-    <script src="js/inert-polyfill.js"></script>
-    <script src="js/restaurant-api.js"></script>
-    <script src="js/app-state.js"></script>
-    <script src="js/notifications.js"></script>
-    <script src="js/components.js"></script>
-    <script type="module" src="js/cart.js"></script>
-    <script src="js/main.js"></script>
+    <script src="/js/inert-polyfill.js"></script>
+    <script src="/js/restaurant-api.js"></script>
+    <script src="/js/app-state.js"></script>
+    <script src="/js/notifications.js"></script>
+    <script src="/js/components.js"></script>
+    <script type="module" src="/js/cart.js"></script>
+    <script src="/js/main.js"></script>
 
     <!-- Service Worker -->
     <script>

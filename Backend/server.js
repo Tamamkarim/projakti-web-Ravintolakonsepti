@@ -4,7 +4,10 @@ const path = require('path');
 const bodyParser = require('body-parser');
 require('dotenv').config();
 
+const database = require('./database/db');
+
 const app = express();
+const JWT_SECRET = process.env.JWT_SECRET;
 const PORT = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
@@ -34,10 +37,12 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 const { rateLimit, errorLogger } = require('./middleware/validation');
 
 // Frontend-tiedostojen palvelu
-app.use(express.static(path.join(__dirname, '../frontend'), {
+app.use(express.static(path.join(__dirname, 'public'), {
     maxAge: NODE_ENV === 'production' ? '1d' : '0',
     etag: false
 }));
+// إضافة خدمة ملفات frontend
+app.use(express.static(path.join(__dirname, '..', 'frontend')));
 
 // Pyyntöjen kirjaus kehitystilassa
 if (NODE_ENV === 'development') {
@@ -51,6 +56,27 @@ if (NODE_ENV === 'development') {
 app.use('/api/auth', require('./src/api/auth'));
 app.use('/api/admin', require('./src/api/admin-api'));
 app.use('/api/menu', require('./src/api/menu'));
+// GET /api/categories
+app.get('/api/categories', async (req, res) => {
+    try {
+        const categories = await database.getAllCategories();
+        res.json({ success: true, data: categories, count: categories.length });
+    } catch (error) {
+        console.error('Virhe kategorioiden haussa:', error);
+        res.status(500).json({ success: false, error: 'Virhe kategorioiden haussa' });
+    }
+});
+
+// GET /api/recipes
+app.get('/api/recipes', async (req, res) => {
+    try {
+        const recipes = await database.getAllRecipes();
+        res.json({ success: true, data: recipes, count: recipes.length });
+    } catch (error) {
+        console.error('Virhe reseptien haussa:', error);
+        res.status(500).json({ success: false, error: 'Virhe reseptien haussa' });
+    }
+});
 // app.use('/api/recipes', require('./src/routes/recipe'));
 
 // API base route
@@ -108,7 +134,7 @@ app.use((req, res, next) => {
     if (req.path.startsWith('/api/')) {
         return res.status(404).json({ error: 'API-päätepistettä ei löydy' });
     }
-    res.sendFile(path.join(__dirname, '../frontend/index.html'));
+    res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
 });
 
 // Käynnistä palvelin

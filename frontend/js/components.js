@@ -109,7 +109,7 @@ class RecipeCard extends BaseComponent {
     this.element = this.createElement('div', 'recipe-card');
     this.element.innerHTML = `
       <div class="recipe-image">
-        <img src="assets/img/${recipe.image ? recipe.image : 'placeholder.jpg'}" alt="${recipe.name}" loading="lazy" onerror="this.onerror=null;this.src='assets/img/placeholder.jpg';">
+        <img src="${recipe.image ? (recipe.image.startsWith('/assets/img/') ? recipe.image : (recipe.image.startsWith('assets/img/') ? '/' + recipe.image : '/assets/img/' + recipe.image)) : '/assets/img/placeholder.jpg'}" alt="${recipe.name}" loading="lazy" onerror="this.onerror=null;this.src='/assets/img/placeholder.jpg';">
         <div class="recipe-rating">
           <span class="stars">${this.generateStars(recipe.rating || 0)}</span>
           <span class="rating-text">${recipe.rating || 0}</span>
@@ -184,7 +184,7 @@ class CartItem extends BaseComponent {
     this.element = this.createElement('div', 'cart-item');
       this.element.innerHTML = `
         <div class="item-image">
-          <img src="${item.image ? item.image : 'assets/img/placeholder.jpg'}" alt="${item.name}" onerror="this.onerror=null;this.src='assets/img/placeholder.jpg';">
+          <img src="${item.image ? '/assets/img/' + item.image : '/assets/img/placeholder.jpg'}" alt="${item.name}" onerror="this.onerror=null;this.src='/assets/img/placeholder.jpg';">
         </div>
       <div class="item-details">
         <h4 class="item-name">${item.name}</h4>
@@ -243,7 +243,7 @@ class RecipeModal extends BaseComponent {
       <div class="modal-content recipe-modal">
         <button class="modal-close">×</button>
         <div class="modal-header">
-          <img src="${recipe.image || '/assets/img/placeholder.jpg'}" alt="${recipe.name}" class="modal-image">
+          <img src="${recipe.image ? (recipe.image.startsWith('/assets/img/') ? recipe.image : (recipe.image.startsWith('assets/img/') ? '/' + recipe.image : '/assets/img/' + recipe.image)) : '/assets/img/placeholder.jpg'}" alt="${recipe.name}" class="modal-image">
           <div class="modal-info">
             <h2>${recipe.name}</h2>
             <p class="recipe-price">${recipe.price} ريال</p>

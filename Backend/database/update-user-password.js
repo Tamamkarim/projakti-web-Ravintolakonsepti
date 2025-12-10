@@ -1,6 +1,9 @@
 const { pool } = require('./db');
 const bcrypt = require('bcrypt');
 
+
+
+
 // بيانات المستخدم
 const email = 'admin@apricus.fi'; // بريد المدير
 const newPassword = 'admin123'; // كلمة المرور الجديدة التي تريدها
@@ -25,3 +28,5 @@ async function updatePassword() {
 }
 
 updatePassword();
+
+

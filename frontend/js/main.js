@@ -604,7 +604,14 @@ function initializeModernApp() {
                 : (item.description || item.description_fi || '');
             return `
               <div class="menu-item" data-id="${item.id}">
-                 <img src="${item.image_url || item.image || 'assets/img/placeholder.jpg'}" 
+                 let imageSrc = item.image_url || item.image || 'placeholder.jpg';
+                 if (!imageSrc.startsWith('assets/img/') && !imageSrc.startsWith('/assets/img/')) {
+                     imageSrc = 'assets/img/' + imageSrc;
+                 }
+                 if (imageSrc.startsWith('/')) {
+                     imageSrc = imageSrc.substring(1);
+                 }
+                 <img src="/${imageSrc}" 
                      alt="${escapeHtml(itemName)}" 
                      class="menu-item-image"
                      onerror="this.src='assets/img/placeholder.jpg'">
@@ -615,7 +622,7 @@ function initializeModernApp() {
                             <h3 class="menu-item-title">${escapeHtml(itemName)}</h3>
                             <div class="menu-item-price">${parseFloat(item.price || 0).toFixed(2)} €</div>
                         </div>
-                        <button class="favorite-btn ${appState.favorites.includes(item.id) ? 'active' : ''}" 
+                        <button class="favorite-btn${appState.favorites.includes(item.id) ? ' active' : ''}" 
                                 onclick="toggleFavorite('${item.id}')" 
                                 title="Lisää suosikkeihin">
                             ❤️
@@ -689,7 +696,7 @@ function initializeModernApp() {
         const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
         const total = calculateCartTotal();
         
-        console.log('🛒 Ostoskorin käyttöliittymän päivitys - tuotteiden määrä:', totalItems, 'ostoskorissa:', cart);
+        console.log('🛒 تحديث واجهة السلة - عدد المنتجات:', totalItems, 'المجموع:', total, 'السلة:', cart);
         
         if (cartCount) {
             if (totalItems > 0) {
@@ -702,7 +709,15 @@ function initializeModernApp() {
         }
         
         if (cartTotal) {
-            cartTotal.textContent = total.toFixed(2) + ' €';
+            if (!isNaN(total)) {
+                cartTotal.textContent = total.toFixed(2) + ' €';
+                cartTotal.style.display = 'inline-block';
+                cartTotal.style.color = '#e74c3c';
+                cartTotal.style.fontWeight = 'bold';
+                cartTotal.style.fontSize = '1.3rem';
+            } else {
+                cartTotal.textContent = '0,00 €';
+            }
         }
         
         if (checkoutBtn) {
@@ -726,7 +741,7 @@ function initializeModernApp() {
                     const imageName = cartItem.image || item.image || 'placeholder.jpg';
                     return `
                         <div class="cart-item">
-                            <img src="assets/img/${imageName}" 
+                            <img src="/assets/img/${imageName}" 
                                  alt="${escapeHtml(cartItem.name || item.name)}" 
                                  class="cart-item-image" onerror="this.onerror=null;this.src='assets/img/placeholder.jpg';">
                             <div class="cart-item-details">
@@ -830,10 +845,18 @@ function initializeModernApp() {
                 const item = appState.menu.find(m => m.id == itemId);
                 if (!item) return '';
                 // استخدم image_url أو image أو صورة افتراضية
-                const imageSrc = item.image_url || item.image || 'assets/img/placeholder.jpg';
+                let imageSrc = item.image_url || item.image || 'placeholder.jpg';
+                // إذا كان المسار يحتوي بالفعل على 'assets/img/' في بدايته فلا تضفها مرة أخرى
+                if (!imageSrc.startsWith('assets/img/') && !imageSrc.startsWith('/assets/img/')) {
+                    imageSrc = 'assets/img/' + imageSrc;
+                }
+                // إذا كان المسار يبدأ بـ '/' أزلها ليكون المسار نسبيًا
+                if (imageSrc.startsWith('/')) {
+                    imageSrc = imageSrc.substring(1);
+                }
                 return `
                     <div class="favorite-item">
-                        <img src="${imageSrc}" 
+                        <img src="/${imageSrc}" 
                              alt="${escapeHtml(item.name)}" 
                              class="favorite-item-image"
                              onerror="this.onerror=null;this.src='assets/img/placeholder.jpg';">
@@ -1014,6 +1037,14 @@ function initializeModernApp() {
         }
     }
 
+    // Pikakäyttö: Admin-kirjautuminen
+    const quickAdminBtn = document.getElementById('quickAdminBtn');
+    if (quickAdminBtn) {
+        quickAdminBtn.addEventListener('click', function() {
+            window.location.href = 'views/admin.html'; // يمكنك استبداله بفتح نموذج الدخول إذا أردت
+        });
+    }
+
     // Global helper functions
     window.toggleFavorite = function(itemId) {
         const index = appState.favorites.indexOf(itemId);
@@ -1100,7 +1131,14 @@ function initializeModernApp() {
                     <button class="close-btn" onclick="this.closest('.item-detail-modal').remove()">×</button>
                 </div>
                 <div class="modal-body">
-                    <img src="${!item.image ? 'assets/img/placeholder.jpg' : (item.image.startsWith('assets/img/') ? item.image : 'assets/img/' + item.image)}" alt="${escapeHtml(name)}" class="item-detail-image">
+                    let imageSrc = item.image_url || item.image || 'placeholder.jpg';
+                    if (!imageSrc.startsWith('assets/img/') && !imageSrc.startsWith('/assets/img/')) {
+                        imageSrc = 'assets/img/' + imageSrc;
+                    }
+                    if (imageSrc.startsWith('/')) {
+                        imageSrc = imageSrc.substring(1);
+                    }
+                    <img src="/${imageSrc}" alt="${escapeHtml(name)}" class="item-detail-image">
                     <div class="item-detail-info">
                         <p class="item-description">${escapeHtml(description)}</p>
                         <div class="item-price">${parseFloat(item.price || 0).toFixed(2)} €</div>

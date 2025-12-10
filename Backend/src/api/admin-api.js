@@ -1,8 +1,25 @@
-
 const express = require('express');
 const router = express.Router();
-
 const { validateRequired } = require('../../middleware/validation');
+const database = require('../../database/db');
+
+// جلب جميع الطلبات للإدارة
+router.get('/orders', (req, res) => {
+  try {
+    const orders = database.getAllOrders();
+    res.json({
+      success: true,
+      data: orders,
+      count: orders.length
+    });
+  } catch (error) {
+    console.error('خطأ في جلب الطلبات:', error);
+    res.status(500).json({
+      success: false,
+      error: 'خطأ في جلب الطلبات'
+    });
+  }
+});
 
 // حذف طلب
 router.delete('/orders/:id', (req, res) => {
@@ -221,25 +238,21 @@ router.delete('/recipes/:id', (req, res) => {
 });
 
 // جلب الإحصائيات
-router.get('/stats', (req, res) => {
+router.get('/stats', async (req, res) => {
   try {
-    const stats = database.getStats();
-    
+    const stats = await database.getStats();
     // إضافة إحصائيات إضافية
-    const orders = database.getAllOrders();
+    const orders = await database.getAllOrders();
     const today = new Date().toDateString();
     const todayOrders = orders.filter(order => 
       new Date(order.createdAt).toDateString() === today
     );
-    
     const totalRevenue = orders
       .filter(order => order.status === 'delivered')
       .reduce((sum, order) => sum + order.totalAmount, 0);
-    
     const todayRevenue = todayOrders
       .filter(order => order.status === 'delivered')
       .reduce((sum, order) => sum + order.totalAmount, 0);
-    
     res.json({
       success: true,
       data: {

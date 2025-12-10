@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Paneeli - Ravintolakonsepti</title>
-    <link rel="stylesheet" href="../css/styles.css">
-    <link rel="stylesheet" href="../css/admin.css">
-    <link rel="stylesheet" href="../css/components.css">
-    <link rel="icon" type="image/png" href="assets/img/logo.png">
+    <title>Admin Ravintolakonsepti</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="icon" type="image/png" href="/assets/img/logo.png">
 </head>
 <body class="admin-body">
     <!-- Loading Overlay -->
@@ -36,7 +36,7 @@
 
     <header class="admin-header">
         <div class="admin-nav">
-            <img src="assets/img/logo.png" alt="Logo" class="admin-logo">
+            <img src="./assets/img/logo.png" alt="TK" class="admin-logo">
             <h1 data-i18n="adminPanel">Hallintapaneeli</h1>
             <div class="admin-user">
                 <span id="adminUserName" data-i18n="adminUser">Admin</span>
@@ -122,33 +122,37 @@
 
             <!-- Menu Management Section -->
             <section id="menu-management" class="admin-section">
-                <div class="section-header">
-                    <h2 data-i18n="menuManagement">Ruokalistan hallinta</h2>
-                    <button id="btnAddDish" class="btn primary" data-i18n="addDish">Lisää uusi ruokalaji</button>
+                <div class="section-header" style="display: flex; align-items: center; justify-content: space-between;">
+                    <h2 style="font-size: 2.2rem; color: #d35400; font-weight: bold; margin: 0;">Ruokalistan hallinta</h2>
+                    <button id="btnAddDish" class="btn primary" style="font-size: 1rem; padding: 10px 20px;">Lisää uusi ruokalaji</button>
                 </div>
 
-                <div class="menu-filters">
-                    <input type="text" id="menuSearch" placeholder="Hae ruokalajia..." class="admin-input" data-i18n="searchDish">
-                    <select id="categoryFilter" class="admin-select">
-                        <option value="" data-i18n="allCategories">Kaikki kategoriat</option>
+                <div style="margin: 30px 0; text-align: center;">
+                    <img src="/assets/img/Baklava.jpeg" alt="Ruokalistan kuva" style="max-width: 350px; width: 100%; height: auto; border-radius: 18px; box-shadow: 0 4px 24px rgba(0,0,0,0.12);">
+                </div>
+
+                <div class="menu-filters" style="display: flex; gap: 20px; margin-bottom: 20px;">
+                    <input type="text" id="menuSearch" placeholder="Hae ruokalajia..." class="admin-input" style="flex:2; font-size:1rem;">
+                    <select id="categoryFilter" class="admin-select" style="flex:1; font-size:1rem;">
+                        <option value="">Kaikki kategoriat</option>
                     </select>
-                    <select id="availabilityFilter" class="admin-select">
-                        <option value="" data-i18n="all">Kaikki</option>
-                        <option value="true" data-i18n="available">Saatavilla</option>
-                        <option value="false" data-i18n="notAvailable">Ei saatavilla</option>
+                    <select id="availabilityFilter" class="admin-select" style="flex:1; font-size:1rem;">
+                        <option value="">Kaikki</option>
+                        <option value="true">Saatavilla</option>
+                        <option value="false">Ei saatavilla</option>
                     </select>
                 </div>
 
-                <div class="menu-table-container">
-                    <table class="admin-table" id="menuTable">
-                        <thead>
-                            <tr>
-                                <th data-i18n="image">Kuva</th>
-                                <th data-i18n="name">Nimi</th>
-                                <th data-i18n="category">Kategoria</th>
-                                <th data-i18n="price">Hinta</th>
-                                <th data-i18n="availability">Saatavuus</th>
-                                <th data-i18n="actions">Toiminnot</th>
+                <div class="menu-table-container" style="background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); padding: 20px;">
+                    <table class="admin-table" id="menuTable" style="width:100%; border-collapse:collapse;">
+                        <thead style="background:#f6f6f6;">
+                            <tr style="font-size:1.1rem; color:#333;">
+                                <th style="padding:12px;">Kuva</th>
+                                <th style="padding:12px;">Nimi</th>
+                                <th style="padding:12px;">Kategoria</th>
+                                <th style="padding:12px;">Hinta</th>
+                                <th style="padding:12px;">Saatavuus</th>
+                                <th style="padding:12px;">Toiminnot</th>
                             </tr>
                         </thead>
                         <tbody id="menuTableBody">
@@ -335,11 +339,11 @@
     </div>
 
     <!-- Scripts -->
-    <script src="../js/inert-polyfill.js"></script>
-    <script src="../js/restaurant-api.js"></script>
-    <script src="../js/app-state.js"></script>
-    <script src="../js/notifications.js"></script>
-    <script src="../js/components.js"></script>
-    <script src="../js/admin.js"></script>
+    <script src="/js/inert-polyfill.js"></script>
+    <script src="/js/restaurant-api.js"></script>
+    <script src="/js/app-state.js"></script>
+    <script src="/js/notifications.js"></script>
+    <script src="/js/components.js"></script>
+    <script src="/js/admin.js"></script>
 </body>
 </html>
