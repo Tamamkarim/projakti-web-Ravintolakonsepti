@@ -35,7 +35,8 @@
                 <!-- Language Selector -->
                 <div class="language-selector" style="margin-right: 1rem;">
                     
-                    <select id="langSelect">
+                    <label for="langSelect" id="langSelectLabel" style="position:absolute;left:-9999px;">Valitse kieli</label>
+                    <select id="langSelect" aria-labelledby="langSelectLabel">
                         <option value="fi">Suomi</option>
                         <option value="en">English</option>
                     </select>
@@ -52,26 +53,27 @@
                 </div>
 
                 <!-- Cart Button -->
-                <button class="action-btn cart-btn" id="cartBtn">
+                <button class="action-btn cart-btn" id="cartBtn" aria-label="Avaa ostoskori">
                     <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <circle cx="9" cy="21" r="1"/>
                         <circle cx="20" cy="21" r="1"/>
                         <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
                     </svg>
-                    <span class="cart-count" id="cartCount"></span>
+                        <span class="cart-count" id="cartCount" aria-label="Ostoskori"></span>
                 </button>
 
                 <!-- Favorites Button -->
-                <button class="action-btn favorites-btn" id="favoritesBtn">
+                <button class="action-btn favorites-btn" id="favoritesBtn" aria-label="Avaa suosikit">
                     <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                     </svg>
+                        <span class="favorites-count" id="favoritesCount" aria-label="Suosikit"></span>
                 </button>
 
                 <!-- User Menu -->
                 <div class="user-menu">
                     <button class="action-btn user-btn" id="userBtn">
-                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-label="Käyttäjä">
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                             <circle cx="12" cy="7" r="4"/>
                         </svg>
@@ -110,9 +112,9 @@
 
             <!-- Mobile Menu Toggle -->
             <button class="mobile-menu-toggle" id="mobileMenuToggle">
-                <span></span>
-                <span></span>
-                <span></span>
+                <span aria-label="Valikko"></span>
+                <span aria-label="Valikko"></span>
+                <span aria-label="Valikko"></span>
             </button>
         </div>
     </header>
@@ -164,7 +166,8 @@
 
                     <div class="filter-group">
                         <h3 data-i18n="allergens">Allergeenit (poissulje)</h3>
-                        <select id="allergenFilter" multiple class="allergen-select">
+                        <label for="allergenFilter" id="allergenFilterLabel" style="position:absolute;left:-9999px;">Valitse allergeenit</label>
+                        <select id="allergenFilter" multiple class="allergen-select" aria-labelledby="allergenFilterLabel">
                             <option value="nuts" data-i18n="nuts">🥜 Pähkinät</option>
                             <option value="fish" data-i18n="fish">🐟 Kala</option>
                             <option value="shellfish" data-i18n="shellfish">🦐 Äyriäiset</option>
@@ -176,7 +179,8 @@
                     <div class="filter-group">
                         <h3 data-i18n="priceRange">Hintaluokka</h3>
                         <div class="price-range">
-                            <input type="range" id="priceRange" min="0" max="50" value="50" class="price-slider">
+                            <label for="priceRange" id="priceRangeLabel" style="position:absolute;left:-9999px;">Hintaluokka</label>
+                            <input type="range" id="priceRange" min="0" max="50" value="50" class="price-slider" aria-labelledby="priceRangeLabel">
                             <div class="price-display">
                                 <span data-i18n="minPrice">0€</span>
                                 <span id="maxPrice" data-i18n="maxPrice">50€</span>
@@ -254,7 +258,7 @@
     <aside class="cart-sidebar" id="cartSidebar">
         <div class="cart-header">
             <h2 data-i18n="cart">Ostoskori</h2>
-            <button class="close-btn" id="closeCart">
+            <button class="close-btn" id="closeCart" aria-label="Sulje ostoskori">
                 <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <line x1="18" y1="6" x2="6" y2="18"/>
                     <line x1="6" y1="6" x2="18" y2="18"/>
@@ -282,7 +286,7 @@
     <aside class="favorites-sidebar" id="favoritesSidebar">
         <div class="favorites-header">
             <h2 data-i18n="favorites">Suosikit</h2>
-            <button class="close-btn" id="closeFavorites">
+            <button class="close-btn" id="closeFavorites" aria-label="Sulje suosikit">
                 <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <line x1="18" y1="6" x2="6" y2="18"/>
                     <line x1="6" y1="6" x2="18" y2="18"/>
